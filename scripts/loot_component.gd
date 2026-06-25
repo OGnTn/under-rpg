@@ -16,7 +16,8 @@ func _ready():
 			resource_component.health_depleted.connect(_on_health_depleted)
 
 func _on_health_depleted():
-	if multiplayer.is_server():
+	# Only the server spawns loot drops (RPC broadcasts to all peers)
+	if not multiplayer.has_multiplayer_peer() or multiplayer.is_server():
 		spawn_drops()
 
 func spawn_drops() -> void:

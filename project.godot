@@ -11,13 +11,16 @@ config_version=5
 [application]
 
 config/name="The Underlands"
-run/main_scene="uid://dt2u3isx7kkmb"
+run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 CraftingManager="*uid://ckhgiisbvhsg"
+_mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
+NetworkManager="*res://scripts/systems/game/network_manager.gd"
+GameManager="*res://scripts/systems/game/game_manager.gd"
 
 [display]
 
@@ -26,7 +29,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_state_charts/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg")
 
 [input]
 

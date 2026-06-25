@@ -186,12 +186,16 @@ func set_charge_amount(amount: float) -> void:
 	set_draw_amount(amount)
 
 func start_attack(attack_type: StringName = &"regular") -> void:
-	if is_multiplayer_authority() and multiplayer.has_multiplayer_peer():
-		_start_attack_raw.rpc(attack_type)
+	# Only the authority (server) triggers attack animations across the network
+	if multiplayer.has_multiplayer_peer():
+		if is_multiplayer_authority():
+			_start_attack_raw.rpc(attack_type)
+		# Non-authority peers do nothing — server will send the RPC
 	else:
+		# Singleplayer fallback
 		_start_attack_raw(attack_type)
 
-@rpc("any_peer", "call_local", "reliable")
+@rpc("authority", "call_local", "reliable")
 func _start_attack_raw(attack_type: StringName) -> void:
 	is_attacking = true
 	attack_time = 0.0

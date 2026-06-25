@@ -17,9 +17,11 @@ signal ui_hidden()
 
 
 func _ready() -> void:
-	if (!is_multiplayer_authority()):
+	# Only show UI for the local player (check parent Player's owning_peer_id)
+	if not _is_local_player():
 		$"../InventoryControl".queue_free()
 		queue_free()
+		return
 	inventory = get_node("../../Inventory")
 	picked_up_item_stack = ItemStack.new() # [cite: 20]
 	if !inventory:
@@ -213,8 +215,16 @@ func hide_inventory():
 		ui_hidden.emit()
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
+func _is_local_player() -> bool:
+	var p = get_parent()
+	while p:
+		if "owning_peer_id" in p:
+			return p.owning_peer_id == multiplayer.get_unique_id()
+		p = p.get_parent()
+	return is_multiplayer_authority()
+
 func _input(event: InputEvent) -> void:
-	if (is_multiplayer_authority()):
+	if _is_local_player():
 		if event.is_action_pressed("toggle_inventory"):
 			print("Toggling inventory")
 			toggle_inventory()

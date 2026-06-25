@@ -89,13 +89,12 @@ func _on_stats_changed() -> void:
 		stamina_changed.emit(old, current_stamina)
 
 func _on_hittable_hit(damage: int, damage_source: Node3D, _pos: Vector3, _normal: Vector3):
-	if multiplayer.is_server():
-		# Check tool compatibility if present
-		var tool_compat = get_parent().find_child("ToolCompatibilityComponent", true, false)
-		if tool_compat and not tool_compat.is_compatible(damage_source):
-			return
-		
-		take_damage(damage)
+	# Check tool compatibility if present (on server, but check replicated too)
+	var tool_compat = get_parent().find_child("ToolCompatibilityComponent", true, false)
+	if tool_compat and not tool_compat.is_compatible(damage_source):
+		return
+	
+	take_damage(damage)
 
 func take_damage(amount: int):
 	if current_health <= 0:
@@ -106,7 +105,8 @@ func take_damage(amount: int):
 	
 	if current_health <= 0:
 		health_depleted.emit()
-		if destroy_parent_on_depletion:
+		# Only the server destroys the parent (queue_free is synced via MultiplayerSpawner)
+		if destroy_parent_on_depletion and multiplayer.is_server():
 			get_parent().queue_free()
 
 func heal(amount: int):

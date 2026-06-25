@@ -1,0 +1,129 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_main"]
+[ext_resource type="Theme" path="res://resources/themes/base_theme.tres" id="2_theme"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_main")
+
+[node name="MainPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainPanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+text = "The Underlands"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 36
+
+[node name="PlayerNameInput" type="LineEdit" parent="MainPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Player Name"
+
+[node name="IPInput" type="LineEdit" parent="MainPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "127.0.0.1"
+text = "127.0.0.1"
+
+[node name="PortInput" type="LineEdit" parent="MainPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "9999"
+text = "9999"
+
+[node name="HostButton" type="Button" parent="MainPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Host Game"
+
+[node name="JoinButton" type="Button" parent="MainPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Join Game"
+
+[node name="StatusLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -60.0
+offset_bottom = -20.0
+offset_left = 20.0
+offset_right = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+text = ""
+horizontal_alignment = 1
+
+[node name="LobbyPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LobbyPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="LobbyTitle" type="Label" parent="LobbyPanel/VBoxContainer"]
+layout_mode = 2
+text = "Lobby"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+
+[node name="PlayerList" type="VBoxContainer" parent="LobbyPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="ReadyCheck" type="CheckBox" parent="LobbyPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Ready"
+
+[node name="StartButton" type="Button" parent="LobbyPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Start Game"
+disabled = true
+
+[node name="DisconnectButton" type="Button" parent="LobbyPanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Disconnect"

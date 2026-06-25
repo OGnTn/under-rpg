@@ -19,9 +19,11 @@ func _ready():
 		hittable.hit.connect(_on_hit)
 
 func _on_hit(_amount: int, source: Node3D, _pos: Vector3, _normal: Vector3):
-	state_chart.send_event("Damaged")
-	if source:
-		_flee_from_source(source.global_position)
+	# Only the server controls NPC AI state
+	if not multiplayer.has_multiplayer_peer() or multiplayer.is_server():
+		state_chart.send_event("Damaged")
+		if source:
+			_flee_from_source(source.global_position)
 
 var flee_target_position: Vector3
 
@@ -39,6 +41,9 @@ func _flee_from_source(source_pos: Vector3):
 
 func _on_wander_state_entered():
 	if !controller: return
+	# AI only runs on the server
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return
 	controller.movement_speed = original_speed
 	_pick_random_wander_target()
 
@@ -49,16 +54,23 @@ func _pick_random_wander_target():
 		controller.set_movement_target(target_pos)
 
 func _on_target_reached():
+	# AI only runs on the server
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return
 	state_chart.send_event("TargetReached")
 
 func _on_flee_state_entered():
 	if !controller: return
+	# AI only runs on the server
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return
 	controller.movement_speed = original_speed * flee_speed_multiplier
-	# Assuming _flee_from_source was called by _on_damaged just before this or triggered this transition
-	# If we just entered Flee without damage (unlikely per plan), we should probably pick a point away from closest threat or just random sprint
 	
 func _on_flee_state_exited():
 	if !controller: return
+	# AI only runs on the server
+	if multiplayer.has_multiplayer_peer() and not multiplayer.is_server():
+		return
 	controller.movement_speed = original_speed
 
 func freeze():

@@ -52,27 +52,36 @@ func _trigger_fire() -> void:
 			
 	if not aim_source:
 		return
-		
-	_fire_projectile(aim_source)
+	
+	# Server spawns the projectile and broadcasts to all peers
+	var launch_transform := aim_source.global_transform
+	if _muzzle:
+		launch_transform.origin = _muzzle.global_position
+	else:
+		launch_transform.origin += -aim_source.global_transform.basis.z * 0.6
+	
+	var direction := -aim_source.global_transform.basis.z
+	
+	# Spawn on all peers via RPC
+	_spawn_projectile_rpc.rpc(launch_transform, direction, projectile_speed, damage, projectile_lifetime)
 	weapon_fired.emit()
 
-func _fire_projectile(aim_source: Node3D) -> void:
+
+@rpc("authority", "reliable", "call_local")
+func _spawn_projectile_rpc(launch_transform: Transform3D, direction: Vector3, speed: float, dmg: float, lifetime: float) -> void:
 	if not projectile_scene:
 		return
-		
+	
 	var proj := projectile_scene.instantiate()
 	var parent := get_tree().current_scene
 	if not parent:
 		parent = get_tree().root
 	parent.add_child(proj)
 	
-	var launch_transform := aim_source.global_transform
-	if _muzzle:
-		launch_transform.origin = _muzzle.global_position
-	else:
-		launch_transform.origin += -aim_source.global_transform.basis.z * 0.6
-		
 	proj.global_transform = launch_transform
 	
+	# Server is the authority for projectile physics/damage
+	proj.set_multiplayer_authority(1)
+	
 	if proj.has_method("launch"):
-		proj.launch(-aim_source.global_transform.basis.z, projectile_speed, damage, owner_character, projectile_lifetime)
+		proj.launch(direction, speed, dmg, owner_character, lifetime)

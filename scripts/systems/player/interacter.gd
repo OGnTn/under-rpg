@@ -27,7 +27,7 @@ var player: CharacterBody3D = null
 
 func _physics_process(_delta: float) -> void:
 	# Only process for the local player
-	if not is_multiplayer_authority():
+	if not _is_local():
 		return
 
 	if player and "is_third_person" in player:
@@ -57,9 +57,15 @@ func _physics_process(_delta: float) -> void:
 		crosshair.visible = true
 	
 
+func _is_local() -> bool:
+	if player and "owning_peer_id" in player:
+		return player.owning_peer_id == multiplayer.get_unique_id()
+	return is_multiplayer_authority()
+
+
 func _input(event: InputEvent) -> void:
 	# Only process input for the local player
-	if not is_multiplayer_authority():
+	if not _is_local():
 		return
 
 	if event.is_action_pressed("interact"):
