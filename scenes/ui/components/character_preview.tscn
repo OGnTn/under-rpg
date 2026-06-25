@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://b1vtxf7136opg"]
+
+[ext_resource type="Script" uid="uid://br34tg0twq437" path="res://scripts/systems/inventory-ui/character_preview.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://cu2jqbijc16v0" path="res://scripts/systems/inventory/item_cell.tscn" id="2_8i8w4"]
+
+[node name="CharacterPreview" type="PanelContainer" unique_id=497872238 node_paths=PackedStringArray("sub_viewport", "model_container", "camera")]
+custom_minimum_size = Vector2(250, 400)
+offset_right = 351.0
+offset_bottom = 400.0
+size_flags_vertical = 3
+script = ExtResource("1_script")
+sub_viewport = NodePath("HBoxContainer/SubViewportContainer/SubViewport")
+model_container = NodePath("HBoxContainer/SubViewportContainer/SubViewport/ModelContainer")
+camera = NodePath("HBoxContainer/SubViewportContainer/SubViewport/Camera3D")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1564728218]
+layout_mode = 2
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="HBoxContainer" unique_id=459693891]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="HBoxContainer/SubViewportContainer" unique_id=1632434460]
+own_world_3d = true
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(173, 400)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="HBoxContainer/SubViewportContainer/SubViewport" unique_id=1950331972]
+transform = Transform3D(1, 0, 0, 0, 0.99875, 0.05, 0, -0.05, 0.99875, 0, 0.8, 5)
+fov = 35.0
+
+[node name="ModelContainer" type="Node3D" parent="HBoxContainer/SubViewportContainer/SubViewport" unique_id=42685171]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, 0)
+
+[node name="KeyLight" type="DirectionalLight3D" parent="HBoxContainer/SubViewportContainer/SubViewport" unique_id=724156224]
+transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 0, 3, 0)
+light_energy = 1.8
+light_indirect_energy = 0.5
+shadow_enabled = true
+
+[node name="FillLight" type="DirectionalLight3D" parent="HBoxContainer/SubViewportContainer/SubViewport" unique_id=611241896]
+transform = Transform3D(0.707107, 0.353553, -0.612372, 0, 0.866025, 0.5, 0.707107, -0.353553, 0.612372, 0, 3, 0)
+light_energy = 0.6
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer" unique_id=1529030120]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="GridContainer" type="GridContainer" parent="HBoxContainer/PanelContainer" unique_id=195741081]
+layout_mode = 2
+
+[node name="HeadSlot" parent="HBoxContainer/PanelContainer/GridContainer" unique_id=541804252 instance=ExtResource("2_8i8w4")]
+unique_name_in_owner = true
+custom_maximum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="ChestSlot" parent="HBoxContainer/PanelContainer/GridContainer" unique_id=1240298417 instance=ExtResource("2_8i8w4")]
+unique_name_in_owner = true
+custom_maximum_size = Vector2(64, 64)
+layout_mode = 2
+
+[node name="FeetSlot" parent="HBoxContainer/PanelContainer/GridContainer" unique_id=2074196103 instance=ExtResource("2_8i8w4")]
+unique_name_in_owner = true
+custom_maximum_size = Vector2(64, 64)
+layout_mode = 2

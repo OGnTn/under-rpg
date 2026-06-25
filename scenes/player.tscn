@@ -1,0 +1,1109 @@
+[gd_scene format=3 uid="uid://cgumy61g26e47"]
+
+[ext_resource type="Script" uid="uid://xh5seg1uxnju" path="res://scripts/character_controller.gd" id="1_gvpj1"]
+[ext_resource type="Script" uid="uid://ctpjtp2l135uf" path="res://scripts/systems/player/interacter.gd" id="2_4mov0"]
+[ext_resource type="Script" uid="uid://rvjnf54hch8d" path="res://scripts/arm_spring.gd" id="2_q1g3e"]
+[ext_resource type="PackedScene" uid="uid://dqi7x7bsiqlec" path="res://scenes/items/equipment/plate/iron/plate_iron_helmet.tscn" id="5_0gvfs"]
+[ext_resource type="PackedScene" uid="uid://bkpmrxdvcldkk" path="res://scenes/items/equipment/plate/iron/plate_iron_chest.tscn" id="6_c8p0i"]
+[ext_resource type="PackedScene" uid="uid://b08dadm3rsr4j" path="res://scenes/items/equipment/cloth/cotton/cloth_cotton_helmet.tscn" id="6_gs3cc"]
+[ext_resource type="PackedScene" uid="uid://bxas8a37tpj1w" path="res://assets/character_model.blend" id="6_nkc8p"]
+[ext_resource type="AnimationLibrary" uid="uid://d3h8qu2uqwwdf" path="res://assets/animations/Humanoid/MeleeLib.res" id="7_id8he"]
+[ext_resource type="PackedScene" uid="uid://dg34mt40nokny" path="res://scenes/items/equipment/plate/iron/plate_iron_boot.tscn" id="7_pqqny"]
+[ext_resource type="Script" uid="uid://b4bxk6s5rp0tu" path="res://scripts/pose_blend_component.gd" id="8_3c17b"]
+[ext_resource type="PackedScene" uid="uid://yxu5nmfc63ew" path="res://scenes/fx/post_process.tscn" id="8_q1g3e"]
+[ext_resource type="PackedScene" uid="uid://dqq67bu7bokkt" path="res://scenes/items/equipment/cloth/cotton/cloth_cotton_chest.tscn" id="8_s8wol"]
+[ext_resource type="PackedScene" uid="uid://dq1l6edyyvd68" path="res://scenes/items/equipment/cloth/cotton/cloth_cotton_boot.tscn" id="10_nirif"]
+[ext_resource type="Texture2D" uid="uid://cwcd5atdhacwy" path="res://assets/textures/shapes.png" id="11_0gvfs"]
+[ext_resource type="PackedScene" uid="uid://b33vxdxqs7f0i" path="res://scripts/systems/inventory/inventory.tscn" id="13_pqqny"]
+[ext_resource type="Script" uid="uid://d2rcs8e0w80g5" path="res://scripts/systems/rpg/stats_component.gd" id="14_ic7wx"]
+[ext_resource type="Script" uid="uid://djvfiikgnypci" path="res://scripts/systems/rpg/stats_resource.gd" id="15_gs3cc"]
+[ext_resource type="PackedScene" uid="uid://bltt0iyfat7xo" path="res://scenes/ui_canvas.tscn" id="15_pqqny"]
+[ext_resource type="Script" uid="uid://c3n6f4arw2idn" path="res://scripts/resource_component.gd" id="19_ic7wx"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ke0wg"]
+height = 1.7
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_ke0wg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mduoy"]
+albedo_color = Color(0.9174303, 0.60352457, 0.467947, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ke0wg"]
+material = SubResource("StandardMaterial3D_mduoy")
+size = Vector3(0.15, 0.15, 0.15)
+
+[sub_resource type="Shader" id="Shader_e66xj"]
+code = "shader_type spatial;
+render_mode unshaded, blend_mix, depth_draw_never, depth_test_disabled;
+
+/*
+	AUTHOR: Hannah \"EMBYR\" Crawford
+	ENGINE_VERSION: 4.0.3
+
+	HOW TO USE:
+		1. Create a MeshInstance3D node and place it in your scene.
+		2. Set it's size to 2x2.
+		3. Enable the \"Flip Faces\" option.
+		4. Create a new shader material with this shader.
+		5. Assign the material to the MeshInstance3D
+
+	LIMITATIONS:
+		Does not work well with TAA enabled.
+
+	MOBILE_NOTES:
+		The mobile renderer does not have access to the normal_roughness texture
+		so we must rely on techniques to reconstruct this information from the
+		depth buffer.
+
+		If you require support on mobile please uncomment the SUPPORT_MOBILE line
+		below. I have done my best to match the appearance between the two modes
+		however, mobile does not take into account smooth-shaded faces.
+
+		The high-quality reconstruction method used on mobile is rather heavy on
+		texture samples. If you would like to use the lower-quality recontruction
+		method for better performance, please uncomment the NAIVE_NORMAL_RECONSTRUCTION
+		line below.
+*/
+//#define SUPPORT_MOBILE
+//#define NAIVE_NORMAL_RECONSTRUCTION
+
+group_uniforms outline;
+uniform vec4 outlineColor: source_color = vec4(0.0, 0.0, 0.0, 0.78);
+uniform float depth_threshold = 0.025;
+uniform float normal_threshold : hint_range(0.0, 1.5) = 0.5;
+uniform float normal_smoothing : hint_range(0.0, 1.0) = 0.25;
+
+group_uniforms thickness;
+uniform float max_thickness: hint_range(0.0, 5.0) = 1.3;
+uniform float min_thickness = 0.5;
+uniform float max_distance = 75.0;
+uniform float min_distance = 2.0;
+
+group_uniforms grazing_prevention;
+uniform float grazing_fresnel_power = 5.0;
+uniform float grazing_angle_mask_power = 1.0;
+uniform float grazing_angle_modulation_factor = 50.0;
+
+uniform sampler2D DEPTH_TEXTURE : hint_depth_texture, filter_linear, repeat_disable;
+
+#ifndef SUPPORT_MOBILE
+uniform sampler2D NORMR_TEXTURE : hint_normal_roughness_texture, filter_linear, repeat_disable;
+#else
+varying flat mat4 model_view_matrix;
+#endif// !SUPPORT_MOBILE
+
+struct UVNeighbors {
+	vec2 center;
+	vec2 left;     vec2 right;     vec2 up;          vec2 down;
+	vec2 top_left; vec2 top_right; vec2 bottom_left; vec2 bottom_right;
+};
+
+struct NeighborDepthSamples {
+	float c_d;
+	float l_d;  float r_d;  float u_d;  float d_d;
+	float tl_d; float tr_d; float bl_d; float br_d;
+};
+
+UVNeighbors getNeighbors(vec2 center, float width, float aspect) {
+	vec2 h_offset = vec2(width * aspect * 0.001, 0.0);
+	vec2 v_offset = vec2(0.0, width * 0.001);
+	UVNeighbors n;
+	n.center = center;
+	n.left   = center - h_offset;
+	n.right  = center + h_offset;
+	n.up     = center - v_offset;
+	n.down   = center + v_offset;
+	n.top_left     = center - (h_offset - v_offset);
+	n.top_right    = center + (h_offset - v_offset);
+	n.bottom_left  = center - (h_offset + v_offset);
+	n.bottom_right = center + (h_offset + v_offset);
+	return n;
+}
+
+float getMinimumDepth(NeighborDepthSamples ds){
+	return min(ds.c_d, min(ds.l_d, min(ds.r_d, min(ds.u_d, min(ds.d_d, min(ds.tl_d, min(ds.tr_d, min(ds.bl_d, ds.br_d))))))));
+}
+
+float getLinearDepth(float depth, vec2 uv, mat4 inv_proj) {
+	vec3 ndc = vec3(uv * 2.0 - 1.0, depth);
+	vec4 view = inv_proj * vec4(ndc, 1.0);
+	view.xyz /= view.w;
+	return -view.z;
+}
+
+NeighborDepthSamples getLinearDepthSamples(UVNeighbors uvs, sampler2D depth_tex, mat4 invProjMat) {
+	NeighborDepthSamples result;
+	result.c_d  = getLinearDepth(texture(depth_tex, uvs.center).r, uvs.center, invProjMat);
+	result.l_d  = getLinearDepth(texture(depth_tex, uvs.left).r  , uvs.left  , invProjMat);
+	result.r_d  = getLinearDepth(texture(depth_tex, uvs.right).r , uvs.right , invProjMat);
+	result.u_d  = getLinearDepth(texture(depth_tex, uvs.up).r    , uvs.up    , invProjMat);
+	result.d_d  = getLinearDepth(texture(depth_tex, uvs.down).r  , uvs.down  , invProjMat);
+	result.tl_d = getLinearDepth(texture(depth_tex, uvs.top_left).r, uvs.top_left, invProjMat);
+	result.tr_d = getLinearDepth(texture(depth_tex, uvs.top_right).r, uvs.top_right, invProjMat);
+	result.bl_d = getLinearDepth(texture(depth_tex, uvs.bottom_left).r, uvs.bottom_left, invProjMat);
+	result.br_d = getLinearDepth(texture(depth_tex, uvs.bottom_right).r, uvs.bottom_right, invProjMat);
+	return result;
+}
+
+float remap(float v, float from1, float to1, float from2, float to2) {
+	return (v - from1) / (to1 - from1) * (to2 - from2) + from2;
+}
+
+float fresnel(float amount, vec3 normal, vec3 view) {
+	return pow((1.0 - clamp(dot(normalize(normal), normalize(view)), 0.0, 1.0 )), amount);
+}
+
+float getGrazingAngleModulation(vec3 pixel_normal, vec3 view) {
+	float x = clamp(((fresnel(grazing_fresnel_power, pixel_normal, view) - 1.0) / grazing_angle_mask_power) + 1.0, 0.0, 1.0);
+	return (x + grazing_angle_modulation_factor) + 1.0;
+}
+
+float detectEdgesDepth(NeighborDepthSamples depth_samples, vec3 pixel_normal, vec3 view) {
+	float n_total =
+		depth_samples.l_d +
+		depth_samples.r_d +
+		depth_samples.u_d +
+		depth_samples.d_d +
+		depth_samples.tl_d +
+		depth_samples.tr_d +
+		depth_samples.bl_d +
+		depth_samples.br_d;
+
+	float t = depth_threshold * getGrazingAngleModulation(pixel_normal, view);
+	return step(t, n_total - (depth_samples.c_d * 8.0));
+}
+
+// Reconstruction helpers
+// Source: https://www.reddit.com/r/godot/comments/v70p2k/improved_normal_from_depth/
+#ifdef SUPPORT_MOBILE
+vec3 reconstructWorldPosition(float depth, mat4 model_view, mat4 inv_proj, vec2 screen_uv, mat4 world, mat4 inv_cam){
+  vec4 pos = inverse(model_view) * inv_proj * vec4((screen_uv * 2.0 - 1.0), depth * 2.0 - 1.0, 1.0);
+  pos.xyz /= (pos.w + 0.0001 * (1.-abs(sign(pos.w))));
+  return (pos * inv_cam).xyz + world[3].xyz;
+}
+
+#ifndef NAIVE_NORMAL_RECONSTRUCTION
+vec3 reconstructWorldNormal(sampler2D depth_tex, mat4 model_view, mat4 inv_proj, vec2 screen_uv, mat4 world, mat4 inv_cam, vec2 viewport_size) {
+    vec2 e = vec2(1.0 / viewport_size);
+    float c0 = texture(depth_tex, screen_uv                ).r;
+    float l2 = texture(depth_tex, screen_uv - vec2(2,0) * e).r;
+    float l1 = texture(depth_tex, screen_uv - vec2(1,0) * e).r;
+    float r1 = texture(depth_tex, screen_uv + vec2(1,0) * e).r;
+    float r2 = texture(depth_tex, screen_uv + vec2(2,0) * e).r;
+    float b2 = texture(depth_tex, screen_uv - vec2(0,2) * e).r;
+    float b1 = texture(depth_tex, screen_uv - vec2(0,1) * e).r;
+    float t1 = texture(depth_tex, screen_uv + vec2(0,1) * e).r;
+    float t2 = texture(depth_tex, screen_uv + vec2(0,2) * e).r;
+
+    float dl = abs(l1 * l2 / (2.0 * l2 - l1) - c0);
+    float dr = abs(r1 * r2 / (2.0 * r2 - r1) - c0);
+    float db = abs(b1 * b2 / (2.0 * b2 - b1) - c0);
+    float dt = abs(t1 * t2 / (2.0 * t2 - t1) - c0);
+
+    vec3 ce = reconstructWorldPosition(c0, model_view, inv_proj, screen_uv, world, inv_cam);
+
+    vec3 dpdx = (dl<dr) ?  ce-reconstructWorldPosition(l1, model_view, inv_proj, screen_uv - vec2(1,0) * e, world, inv_cam) :
+                          -ce+reconstructWorldPosition(r1, model_view, inv_proj, screen_uv + vec2(1,0) * e, world, inv_cam) ;
+    vec3 dpdy = (db<dt) ?  ce-reconstructWorldPosition(b1, model_view, inv_proj, screen_uv - vec2(0,1) * e, world, inv_cam) :
+                          -ce+reconstructWorldPosition(t1, model_view, inv_proj, screen_uv + vec2(0,1) * e, world, inv_cam) ;
+
+    return normalize(cross(dpdx,dpdy));
+}
+#else
+vec3 reconstructWorldNormal(sampler2D depth_tex, mat4 model_view, mat4 inv_proj, vec2 screen_uv, mat4 world, mat4 inv_cam, vec2 viewport_size) {
+    vec3 pos = reconstructWorldPosition(texture(depth_tex, screen_uv).x, model_view, inv_proj, screen_uv, world, inv_cam);
+    return normalize(cross(dFdx(pos), dFdy(pos)));
+}
+#endif//!NAIVE_NORMAL_RECONSTRUCTION
+
+float detectEdgesNormalReconstructed(UVNeighbors uvs, sampler2D depth_tex, mat4 model_view, mat4 inv_proj, vec2 screen_uv, mat4 world, mat4 inv_cam, vec2 viewport_size){
+	vec3 n_u  = reconstructWorldNormal(depth_tex, model_view, inv_proj, uvs.up,           world, inv_cam, viewport_size);
+	vec3 n_d  = reconstructWorldNormal(depth_tex, model_view, inv_proj, uvs.down,         world, inv_cam, viewport_size);
+	vec3 n_l  = reconstructWorldNormal(depth_tex, model_view, inv_proj, uvs.left,         world, inv_cam, viewport_size);
+	vec3 n_r  = reconstructWorldNormal(depth_tex, model_view, inv_proj, uvs.right,        world, inv_cam, viewport_size);
+	vec3 n_tl = reconstructWorldNormal(depth_tex, model_view, inv_proj, uvs.top_left,     world, inv_cam, viewport_size);
+	vec3 n_tr = reconstructWorldNormal(depth_tex, model_view, inv_proj, uvs.top_right,    world, inv_cam, viewport_size);
+	vec3 n_bl = reconstructWorldNormal(depth_tex, model_view, inv_proj, uvs.bottom_left,  world, inv_cam, viewport_size);
+	vec3 n_br = reconstructWorldNormal(depth_tex, model_view, inv_proj, uvs.bottom_right, world, inv_cam, viewport_size);
+
+	vec3 normalFiniteDifference0 = n_tr - n_bl;
+	vec3 normalFiniteDifference1 = n_tl - n_br;
+	vec3 normalFiniteDifference2 = n_l - n_r;
+	vec3 normalFiniteDifference3 = n_u - n_d;
+
+	float edgeNormal = sqrt(
+		dot(normalFiniteDifference0, normalFiniteDifference0) +
+		dot(normalFiniteDifference1, normalFiniteDifference1) +
+		dot(normalFiniteDifference2, normalFiniteDifference2) +
+		dot(normalFiniteDifference3, normalFiniteDifference3)
+	) * 0.5;
+
+	return smoothstep(normal_threshold - normal_smoothing, normal_threshold + normal_smoothing, edgeNormal);
+}
+#else
+float detectEdgesNormal(UVNeighbors uvs, sampler2D normTex, vec3 camDirWorld){
+	vec3 n_u = texture(normTex, uvs.up).xyz;
+	vec3 n_d = texture(normTex, uvs.down).xyz;
+	vec3 n_l = texture(normTex, uvs.left).xyz;
+	vec3 n_r = texture(normTex, uvs.right).xyz;
+	vec3 n_tl = texture(normTex, uvs.top_left).xyz;
+	vec3 n_tr = texture(normTex, uvs.top_right).xyz;
+	vec3 n_bl = texture(normTex, uvs.bottom_left).xyz;
+	vec3 n_br = texture(normTex, uvs.bottom_right).xyz;
+
+	vec3 normalFiniteDifference0 = n_tr - n_bl;
+	vec3 normalFiniteDifference1 = n_tl - n_br;
+	vec3 normalFiniteDifference2 = n_l - n_r;
+	vec3 normalFiniteDifference3 = n_u - n_d;
+
+	float edgeNormal = sqrt(
+		dot(normalFiniteDifference0, normalFiniteDifference0) +
+		dot(normalFiniteDifference1, normalFiniteDifference1) +
+		dot(normalFiniteDifference2, normalFiniteDifference2) +
+		dot(normalFiniteDifference3, normalFiniteDifference3)
+	);
+
+	return smoothstep(normal_threshold - normal_smoothing, normal_threshold + normal_smoothing, edgeNormal);
+}
+#endif//SUPPORT_MOBILE
+
+void vertex() {
+	POSITION = vec4(VERTEX, 1.0);
+
+#ifdef SUPPORT_MOBILE
+    model_view_matrix = INV_VIEW_MATRIX * mat4(VIEW_MATRIX[0],VIEW_MATRIX[1],VIEW_MATRIX[2],VIEW_MATRIX[3]);;
+#endif
+}
+
+void fragment() {
+	float aspect = float(VIEWPORT_SIZE.y) / float(VIEWPORT_SIZE.x);
+
+	UVNeighbors n = getNeighbors(SCREEN_UV, max_thickness, aspect);
+	NeighborDepthSamples depth_samples = getLinearDepthSamples(n, DEPTH_TEXTURE, INV_PROJECTION_MATRIX);
+
+	float min_d = getMinimumDepth(depth_samples);
+	float thickness = clamp(remap(min_d, min_distance, max_distance, max_thickness, min_thickness), min_thickness, max_thickness);
+	float fade_a = clamp(remap(min_d, min_distance, max_distance, 1.0, 0.0), 0.0, 1.0);
+
+	n = getNeighbors(SCREEN_UV, thickness, aspect);
+	depth_samples = getLinearDepthSamples(n, DEPTH_TEXTURE, INV_PROJECTION_MATRIX);
+
+#ifndef SUPPORT_MOBILE
+	vec3 pixel_normal = texture(NORMR_TEXTURE, SCREEN_UV).xyz;
+#else
+	vec3 pixel_normal = reconstructWorldNormal(DEPTH_TEXTURE, model_view_matrix, INV_PROJECTION_MATRIX, SCREEN_UV, MODEL_MATRIX, INV_VIEW_MATRIX, VIEWPORT_SIZE.xy);
+#endif
+
+	float depthEdges = detectEdgesDepth(depth_samples, pixel_normal, VIEW);
+
+#ifndef SUPPORT_MOBILE
+	float normEdges = min(detectEdgesNormal(n, NORMR_TEXTURE, CAMERA_DIRECTION_WORLD), 1.0);
+#else
+	float normEdges = min(detectEdgesNormalReconstructed(n, DEPTH_TEXTURE, model_view_matrix, INV_PROJECTION_MATRIX, SCREEN_UV, MODEL_MATRIX, INV_VIEW_MATRIX, VIEWPORT_SIZE.xy), 1.0);
+#endif
+
+	ALBEDO.rgb = outlineColor.rgb;
+	ALPHA = max(depthEdges, normEdges) * outlineColor.a * fade_a;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4mov0"]
+render_priority = 0
+shader = SubResource("Shader_e66xj")
+shader_parameter/outlineColor = Color(0, 0, 0, 0.796078)
+shader_parameter/depth_threshold = 0.025
+shader_parameter/normal_threshold = 0.17600000836
+shader_parameter/normal_smoothing = 0.0
+shader_parameter/max_thickness = 1.2
+shader_parameter/min_thickness = 0.1
+shader_parameter/max_distance = 70.0
+shader_parameter/min_distance = 2.0
+shader_parameter/grazing_fresnel_power = 5.0
+shader_parameter/grazing_angle_mask_power = 1.0
+shader_parameter/grazing_angle_modulation_factor = 50.0
+
+[sub_resource type="Curve" id="Curve_kkhi3"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.396354, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -2.18753, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_vo6no"]
+curve = SubResource("Curve_kkhi3")
+
+[sub_resource type="Gradient" id="Gradient_7nfqo"]
+offsets = PackedFloat32Array(0.882246, 1)
+colors = PackedColorArray(0.768123, 1, 0.74588, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_jv2q0"]
+gradient = SubResource("Gradient_7nfqo")
+
+[sub_resource type="CurveTexture" id="CurveTexture_jv2q0"]
+curve = SubResource("Curve_kkhi3")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_nkc8p"]
+emission_shape = 3
+emission_box_extents = Vector3(7, 4, 8)
+gravity = Vector3(0, -0.1, 0)
+linear_accel_min = -0.700002
+linear_accel_max = 0.699998
+radial_accel_min = -0.200002
+radial_accel_max = 0.199998
+scale_min = 0.0
+scale_max = 2.0
+scale_curve = SubResource("CurveTexture_jv2q0")
+color_ramp = SubResource("GradientTexture1D_jv2q0")
+color_initial_ramp = SubResource("GradientTexture1D_jv2q0")
+alpha_curve = SubResource("CurveTexture_vo6no")
+hue_variation_min = -0.24
+hue_variation_max = 0.27
+
+[sub_resource type="Gradient" id="Gradient_e66xj"]
+offsets = PackedFloat32Array(0, 0.32842)
+colors = PackedColorArray(1, 1, 1, 1, 0.964706, 0.964706, 0.964706, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_id8he"]
+gradient = SubResource("Gradient_e66xj")
+fill = 1
+fill_from = Vector2(0.485017, 0.450771)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o6mxj"]
+transparency = 1
+shading_mode = 2
+vertex_color_use_as_albedo = true
+albedo_texture = SubResource("GradientTexture2D_id8he")
+billboard_mode = 1
+billboard_keep_scale = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_3c17b"]
+material = SubResource("StandardMaterial3D_o6mxj")
+size = Vector2(0.1, 0.1)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ke0wg"]
+
+[sub_resource type="Animation" id="Animation_pjt0s"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ViewModel/ArmContainer/ArmPivot:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.6, 1.3, -0.79999995)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ViewModel/ArmContainer/ArmPivot:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_yxww1"]
+resource_name = "bow_strike"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ViewModel/ArmContainer/ArmPivot:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 1.3, -0.79999995)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ViewModel/ArmContainer/ArmPivot:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, -0.959931)]
+}
+
+[sub_resource type="Animation" id="Animation_wdpcj"]
+resource_name = "bow_windup"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ViewModel/ArmContainer/ArmPivot:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(2.9802322e-08, 1.3, -0.99999994)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ViewModel/ArmContainer/ArmPivot:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, -1.3962634)]
+}
+
+[sub_resource type="Animation" id="Animation_gs3cc"]
+resource_name = "channel_pose"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ViewModel/ArmContainer/ArmPivot:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.010595679, 1.3, -1.118278)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ViewModel/ArmContainer/ArmPivot:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-1.5707964, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_glpr6"]
+resource_name = "r_rest"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ViewModel/ArmContainer/ArmPivot:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.6, 1.3, -0.79999995)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ViewModel/ArmContainer/ArmPivot:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_wa5vi"]
+resource_name = "r_strike"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ViewModel/ArmContainer/ArmPivot:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.9382865, 1.3573487, -0.8013188)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ViewModel/ArmContainer/ArmPivot:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.19727963, 3.0284667, -1.5584385)]
+}
+
+[sub_resource type="Animation" id="Animation_wfnr8"]
+resource_name = "r_windup"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ViewModel/ArmContainer/ArmPivot:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(1.0638229, 1.4507258, -0.7377293)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ViewModel/ArmContainer/ArmPivot:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(6.66658e-09, -0.17491533, -1.293323)]
+}
+
+[sub_resource type="Animation" id="Animation_px5sl"]
+resource_name = "u_strike"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ViewModel/ArmContainer/ArmPivot:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.01818955, 1.163446, -0.9734141)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ViewModel/ArmContainer/ArmPivot:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-1.50553, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_0qfo5"]
+resource_name = "u_windup"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("ViewModel/ArmContainer/ArmPivot:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.01818955, 2.2136445, -0.74732524)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("ViewModel/ArmContainer/ArmPivot:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.704177, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_px5sl"]
+_data = {
+&"RESET": SubResource("Animation_pjt0s"),
+&"bow_strike": SubResource("Animation_yxww1"),
+&"bow_windup": SubResource("Animation_wdpcj"),
+&"channel_pose": SubResource("Animation_gs3cc"),
+&"r_rest": SubResource("Animation_glpr6"),
+&"r_strike": SubResource("Animation_wa5vi"),
+&"r_windup": SubResource("Animation_wfnr8"),
+&"u_strike": SubResource("Animation_px5sl"),
+&"u_windup": SubResource("Animation_0qfo5")
+}
+
+[sub_resource type="Curve" id="Curve_pjt0s"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.25541124, 0.2486772), 0.0, 0.0, 0, 0, Vector2(0.4069264, 0.25925922), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_a5ia6"]
+
+[sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_0dpix"]
+states/BlendSpace2D/node = SubResource("AnimationNodeBlendSpace2D_a5ia6")
+states/BlendSpace2D/position = Vector2(386, 100.22222)
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_irmqu"]
+animation = &"MeleeLib/LightIdle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_7eonc"]
+animation = &"MeleeLib/LightStrafeL"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_50cep"]
+animation = &"MeleeLib/LightStrafeR"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_8yvht"]
+animation = &"MeleeLib/LightRunning"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_lagn4"]
+animation = &"MeleeLib/LightRunning"
+play_mode = 1
+
+[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_x8k1v"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_irmqu")
+blend_point_0/pos = Vector2(0, 0)
+blend_point_0/name = &"MeleeLib_LightIdle"
+blend_point_1/node = SubResource("AnimationNodeAnimation_7eonc")
+blend_point_1/pos = Vector2(-1, 0)
+blend_point_1/name = &"MeleeLib_LightStrafeL"
+blend_point_2/node = SubResource("AnimationNodeAnimation_50cep")
+blend_point_2/pos = Vector2(1, 0)
+blend_point_2/name = &"MeleeLib_LightStrafeR"
+blend_point_3/node = SubResource("AnimationNodeAnimation_8yvht")
+blend_point_3/pos = Vector2(0, 1)
+blend_point_3/name = &"MeleeLib_LightRunning"
+blend_point_4/node = SubResource("AnimationNodeAnimation_lagn4")
+blend_point_4/pos = Vector2(0, -1)
+blend_point_4/name = &"MeleeLib_LightRunning 2"
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_ke0wg"]
+graph_offset = Vector2(-512.5781, -63.69098)
+nodes/output/position = Vector2(266.66666, 266.66666)
+nodes/idle-run/node = SubResource("AnimationNodeBlendSpace2D_x8k1v")
+nodes/idle-run/position = Vector2(-306.66666, 0)
+nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_0dpix")
+nodes/StateMachine/position = Vector2(-240, 320)
+node_connections = [&"output", 0, &"idle-run"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nirif"]
+atlas = ExtResource("11_0gvfs")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="Resource" id="Resource_s8ti4"]
+script = ExtResource("15_gs3cc")
+metadata/_custom_type_script = "uid://d0jmxfan3jg5r"
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_4r5pv"]
+
+[node name="Player" type="CharacterBody3D" unique_id=365988748 groups=["players"]]
+physics_interpolation_mode = 1
+script = ExtResource("1_gvpj1")
+third_person_distance = 4.0
+shoulder_offset = Vector3(1, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=698939475]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8573574, 0)
+shape = SubResource("CapsuleShape3D_ke0wg")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1908685572]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+visible = false
+mesh = SubResource("CapsuleMesh_ke0wg")
+
+[node name="ViewModel" type="Node3D" parent="." unique_id=1720176770]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="ViewModel" unique_id=331272055]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8476624, 0.10041666)
+fov = 80.0
+near = 0.208
+
+[node name="InteractRay" type="RayCast3D" parent="ViewModel/Camera3D" unique_id=1264752553]
+target_position = Vector3(0, 0, -5)
+collide_with_areas = true
+debug_shape_custom_color = Color(0, 0, 0, 0)
+debug_shape_thickness = 1
+script = ExtResource("2_4mov0")
+manipulating = true
+
+[node name="ArmContainer" type="Node3D" parent="ViewModel" unique_id=1998669928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3704474, 0.10041666)
+
+[node name="ArmPivot" type="Node3D" parent="ViewModel/ArmContainer" unique_id=823623403]
+transform = Transform3D(0.99999976, 0, 0, 0, 1.0000002, 0, 0, 0, 0.9999999, 0.6, 1.3, -0.79999995)
+
+[node name="Arm" type="Node3D" parent="ViewModel/ArmContainer/ArmPivot" unique_id=1866110604]
+script = ExtResource("2_q1g3e")
+linear_damping = 15.0
+max_linear_displacement = 50.0
+angular_stiffness = 250.0
+angular_damping = 15.0
+max_angular_displacement = 50.0
+
+[node name="Hand" type="MeshInstance3D" parent="ViewModel/ArmContainer/ArmPivot/Arm" unique_id=1985494900]
+mesh = SubResource("BoxMesh_ke0wg")
+
+[node name="LookTarget" type="Marker3D" parent="ViewModel/ArmContainer" unique_id=1847575764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.16949064, 0.2398587, -7.981726)
+gizmo_extents = 0.48
+
+[node name="character_model" parent="ViewModel" unique_id=1097421619 instance=ExtResource("6_nkc8p")]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+
+[node name="metarig" parent="ViewModel/character_model" index="0" unique_id=853199984]
+transform = Transform3D(1, -1.4133097e-08, -1.1499637e-09, 1.4133097e-08, 0.9868459, 0.16166379, -1.1499637e-09, -0.16166379, 0.9868459, 1.0614053e-08, 0, 0.12141061)
+
+[node name="GeneralSkeleton" parent="ViewModel/character_model/metarig" index="0" unique_id=1716523316]
+bones/1/position = Vector3(8.738046e-06, 0.6276708, -0.050009962)
+bones/1/rotation = Quaternion(0.043918934, 1.8476536e-05, 0.00010581978, 0.99903506)
+bones/2/scale = Vector3(1, 0.99999994, 0.99999994)
+bones/3/rotation = Quaternion(0.032614287, 0.000118558215, -0.00012974578, 0.99946797)
+bones/4/rotation = Quaternion(0.032614283, 0.00035531097, -0.00012968786, 0.9994679)
+bones/4/scale = Vector3(1, 0.99999994, 1)
+bones/5/rotation = Quaternion(-0.047556203, -0.00022628247, 0.00014309146, 0.9988686)
+bones/6/rotation = Quaternion(-0.018586023, -0.00024609757, 0.00010818039, 0.9998272)
+bones/7/rotation = Quaternion(0.7071068, -7.8504635e-17, -7.8504635e-17, 0.7071068)
+bones/8/rotation = Quaternion(0.7071068, 7.605136e-17, 8.095791e-17, 0.7071068)
+bones/9/rotation = Quaternion(2.869099e-15, 0.7071068, 0.7071068, 2.7832344e-15)
+bones/11/rotation = Quaternion(0.019266665, 0.788133, -0.6151319, 0.0093749985)
+bones/11/scale = Vector3(1.0170145, 0.96681046, 1.0170293)
+bones/12/rotation = Quaternion(0.1492732, -0.7858035, 0.21203117, 0.561492)
+bones/12/scale = Vector3(1.0001903, 0.98590744, 1.0151607)
+bones/13/rotation = Quaternion(-0.19437194, 0.56526303, -0.40195408, 0.6936356)
+bones/13/scale = Vector3(1.0152879, 1.00145, 0.9847876)
+bones/14/rotation = Quaternion(-0.17911926, 0.67171264, 0.26814097, 0.6669475)
+bones/15/rotation = Quaternion(0.45055026, 0.17690165, 0.15486832, 0.86123526)
+bones/16/rotation = Quaternion(0.44274712, 0.20235631, 0.14376101, 0.861603)
+bones/17/rotation = Quaternion(0.5415474, 1.1195361e-07, -2.0140807e-09, 0.8406703)
+bones/18/rotation = Quaternion(0.50409794, 1.5913109e-07, -3.4560312e-06, 0.86364657)
+bones/19/rotation = Quaternion(0.5040976, 3.2523224e-07, -3.3055862e-06, 0.86364675)
+bones/20/rotation = Quaternion(0.5400898, -0.025536016, -0.01645002, 0.84105915)
+bones/21/rotation = Quaternion(0.5046124, 0.0039613904, -0.015333055, 0.8632008)
+bones/22/rotation = Quaternion(0.50355315, -0.02342094, -3.2206367e-06, 0.8636467)
+bones/23/rotation = Quaternion(0.54071856, -0.019261956, -0.012408259, 0.8408914)
+bones/24/rotation = Quaternion(0.5043509, 0.0018592718, -0.011560796, 0.86341935)
+bones/25/rotation = Quaternion(0.5037392, -0.01900882, -3.6341366e-06, 0.8636466)
+bones/26/rotation = Quaternion(0.5386138, -0.036175404, -0.023303775, 0.8414533)
+bones/27/rotation = Quaternion(0.5049352, 0.0025763528, -0.021744134, 0.86287946)
+bones/28/rotation = Quaternion(0.5029494, -0.034007154, -3.6004349e-06, 0.8636466)
+bones/30/rotation = Quaternion(0.051120173, 0.8330897, -0.5506826, -0.009857498)
+bones/30/scale = Vector3(1.0163224, 0.9681303, 1.0163364)
+bones/31/rotation = Quaternion(0.19471726, 0.60526925, -0.1543574, 0.7562461)
+bones/31/scale = Vector3(1.0001807, 0.9876675, 1.0132248)
+bones/32/rotation = Quaternion(-0.26413432, -0.40354064, 0.3228301, 0.8143518)
+bones/32/scale = Vector3(1.0119796, 1.004286, 0.98520064)
+bones/33/rotation = Quaternion(-0.17911926, -0.67171264, -0.26814106, 0.66694736)
+bones/34/rotation = Quaternion(0.4505506, -0.17690222, -0.1548688, 0.86123496)
+bones/35/rotation = Quaternion(0.44274727, -0.20235564, -0.14376126, 0.86160314)
+bones/36/rotation = Quaternion(0.5415475, -2.2314305e-07, -3.5641966e-07, 0.84067017)
+bones/37/rotation = Quaternion(0.50409764, 1.10481416e-07, 3.3976758e-06, 0.8636467)
+bones/38/rotation = Quaternion(0.50409806, -3.882704e-08, 3.4274933e-06, 0.86364645)
+bones/39/rotation = Quaternion(0.54008955, 0.025535867, 0.016449599, 0.8410592)
+bones/40/rotation = Quaternion(0.50461257, -0.003961138, 0.0153330555, 0.86320066)
+bones/41/rotation = Quaternion(0.5035535, 0.023421004, 3.4270201e-06, 0.8636466)
+bones/42/rotation = Quaternion(0.54071915, 0.019261938, 0.0124084065, 0.8408912)
+bones/43/rotation = Quaternion(0.50435066, -0.0018595408, 0.011560683, 0.86341953)
+bones/44/rotation = Quaternion(0.5037396, 0.01900897, 3.3060933e-06, 0.86364645)
+bones/45/rotation = Quaternion(0.53861386, 0.03617531, 0.023303686, 0.84145314)
+bones/46/rotation = Quaternion(0.5049356, -0.0025760985, 0.021744255, 0.8628792)
+bones/47/rotation = Quaternion(0.50294966, 0.03400714, 3.5744597e-06, 0.8636465)
+bones/48/rotation = Quaternion(-0.0017901623, 0.30660984, 0.9380546, -0.16137172)
+bones/48/scale = Vector3(1.011834, 0.97675234, 1.0118315)
+bones/49/rotation = Quaternion(0.02252216, 0.9704032, -0.21678472, 0.1039949)
+bones/49/scale = Vector3(0.9992726, 0.99314034, 1.0081187)
+bones/50/rotation = Quaternion(-0.13873658, 0.74879825, -0.64797455, 0.013509295)
+bones/50/scale = Vector3(0.990904, 1.0016184, 1.0081464)
+bones/51/rotation = Quaternion(-5.3494463e-05, 1, -0.0001467082, -5.159589e-05)
+bones/51/scale = Vector3(0.99973285, 1.0003262, 0.99994165)
+bones/52/rotation = Quaternion(0.00076675904, 0.1027896, 0.9896801, 0.099834874)
+bones/52/scale = Vector3(1.0144385, 0.9717425, 1.0144362)
+bones/53/rotation = Quaternion(-0.009757292, 0.9538377, -0.29836917, -0.032778166)
+bones/53/scale = Vector3(0.99914503, 0.98541945, 1.0165803)
+bones/54/rotation = Quaternion(0.03775849, 0.5256852, -0.84116125, -0.12114985)
+bones/54/scale = Vector3(0.98923045, 0.9966528, 1.0150536)
+bones/55/rotation = Quaternion(-0.00010396238, 1, 0.00021983267, 2.453652e-05)
+bones/55/scale = Vector3(0.99988663, 1.0001323, 0.99998087)
+
+[node name="OriginalSkeleton" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D" parent_id_path=PackedInt32Array(1097421619, 8038438) index="0" unique_id=1814940340]
+bones/0/position = Vector3(8.738046e-06, 0.6276708, -0.050009962)
+bones/0/rotation = Quaternion(0.19823611, 3.4772096e-05, 0.00010170081, 0.9801543)
+bones/1/position = Vector3(0, 0.12408221, 2.9802322e-08)
+bones/1/rotation = Quaternion(-0.10591642, -4.2365706e-09, -2.9522162e-08, 0.99437505)
+bones/1/scale = Vector3(1, 1, 1)
+bones/2/position = Vector3(1.4551915e-11, 0.16994226, -1.4901161e-08)
+bones/2/rotation = Quaternion(-0.031668063, 0.000113986185, -0.00013378655, 0.9994984)
+bones/2/scale = Vector3(1, 0.99999994, 0.9999999)
+bones/3/position = Vector3(-3.6379788e-11, 0.18603873, 0)
+bones/3/rotation = Quaternion(0.029580466, 0.0003592305, -0.000118033146, 0.9995623)
+bones/3/scale = Vector3(1.0000001, 0.99999994, 1)
+bones/4/position = Vector3(2.910383e-11, 0.22291088, 0.0024441332)
+bones/4/rotation = Quaternion(0.29225317, -0.00017203458, 0.00020508064, 0.95634097)
+bones/4/scale = Vector3(1, 0.9999999, 0.99999994)
+bones/5/position = Vector3(-5.0931703e-11, 0.040176988, -5.9604645e-08)
+bones/5/rotation = Quaternion(-0.23391739, -0.00017755863, 0.00020178505, 0.9722564)
+bones/5/scale = Vector3(1, 1.0000001, 0.9999999)
+bones/7/position = Vector3(0.018299997, 0.10899079, 0.07823317)
+bones/7/scale = Vector3(0.99999994, 0.9999998, 0.9999999)
+bones/8/position = Vector3(-0.018300002, 0.10899091, 0.07823318)
+bones/8/rotation = Quaternion(-0.5538833, 0.42277193, 0.43428773, 0.57085145)
+bones/8/scale = Vector3(1, 0.9999999, 0.99999994)
+bones/9/rotation = Quaternion(-5.4327835e-08, 0.69439507, 0.719594, -5.2425364e-08)
+bones/10/rotation = Quaternion(-5.4327835e-08, 0.69439507, 0.719594, -5.2425364e-08)
+bones/13/position = Vector3(0.18425162, 0.060480773, 0.025503308)
+bones/13/rotation = Quaternion(0.84779066, 0.16088234, -0.012684832, 0.5051801)
+bones/13/scale = Vector3(1.0118339, 0.97732663, 1.0112762)
+bones/14/position = Vector3(-2.9802322e-08, 0.32324904, 0)
+bones/14/rotation = Quaternion(0.37999442, -0.103234045, 0.026297601, 0.91883373)
+bones/14/scale = Vector3(0.9993272, 0.98929703, 1.0119599)
+bones/15/position = Vector3(-0.00038716197, 0.32603687, -2.9802322e-08)
+bones/15/rotation = Quaternion(-0.5830001, 0.02761485, 0.13629705, 0.800482)
+bones/15/scale = Vector3(0.9901665, 1.0013434, 1.0091604)
+bones/16/position = Vector3(-0.0005508661, 0.18337859, -5.9604645e-08)
+bones/16/rotation = Quaternion(6.354543e-05, 0.9878212, -0.1555932, -3.7405887e-05)
+bones/16/scale = Vector3(0.9997332, 1.0002905, 0.9999767)
+bones/18/position = Vector3(-0.18425164, 0.060480773, 0.025503188)
+bones/18/rotation = Quaternion(0.94276756, -0.09950568, 0.008137291, 0.3181537)
+bones/18/scale = Vector3(1.0144385, 0.9724442, 1.0137631)
+bones/19/position = Vector3(-2.9802322e-08, 0.32324913, -1.4901161e-08)
+bones/19/rotation = Quaternion(0.46028548, 0.032443125, -0.0109875165, 0.8871099)
+bones/19/scale = Vector3(0.9991524, 0.98152184, 1.0206844)
+bones/20/position = Vector3(0.00011458993, 0.326037, 1.4901161e-08)
+bones/20/rotation = Quaternion(-0.7958201, 0.10531553, -0.07098074, 0.59206486)
+bones/20/scale = Vector3(0.98920286, 1.0034181, 1.008118)
+bones/21/position = Vector3(0.0008673072, 0.18337736, 6.7055225e-08)
+bones/21/rotation = Quaternion(9.587443e-05, 0.9877738, -0.15589398, 4.8050693e-05)
+bones/21/scale = Vector3(0.9998858, 1.000438, 0.9996761)
+bones/22/rotation = Quaternion(-0.68824595, 0.688246, -0.16222678, -0.16222641)
+
+[node name="spine_006" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton" index="0" unique_id=2085659543]
+transform = Transform3D(0.99949765, 0.0022552721, -0.031617157, -0.008943834, 0.97700095, -0.21304688, 0.030409513, 0.2132227, 0.9765299, -0.0016168681, 1.3807597, 0.18260051)
+
+[node name="char_mesh_006" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/spine_006" index="0" unique_id=1332166542]
+transform = Transform3D(0.99998814, -0.004760485, -0.0011223368, 0.0047950544, 0.9994393, 0.0331358, 0.00096395984, -0.033140905, 0.99944997, 0.035311848, -1.4539868, -0.0661532)
+
+[node name="slot_helmet" type="Node3D" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/spine_006" index="1" unique_id=1438115060]
+unique_name_in_owner = true
+transform = Transform3D(0.99998116, -0.006045413, -0.0010777693, 0.006100278, 0.9980884, 0.061500695, 0.0007039383, -0.061505385, 0.9981081, 0.029401612, 0.4270041, -0.07752295)
+
+[node name="plate_iron_helmet" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/spine_006/slot_helmet" unique_id=113848693 instance=ExtResource("5_0gvfs")]
+transform = Transform3D(1.0000008, 0, 0, 0, 1.0000002, 0, 0, 0, 1.0000006, 0, 0, 0)
+
+[node name="cloth_cotton_helmet" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/spine_006/slot_helmet" unique_id=445310787 instance=ExtResource("6_gs3cc")]
+visible = false
+
+[node name="spine_003" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton" index="1" unique_id=1159032667]
+transform = Transform3D(0.99994916, -0.0025381185, -0.009772, -0.00013263129, 0.9644992, -0.26408494, 0.010095368, 0.26407272, 0.96444976, -0.00045279096, 1.0910095, 0.06821506)
+
+[node name="slot_chest" type="Node3D" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/spine_003" index="1" unique_id=119008403]
+unique_name_in_owner = true
+transform = Transform3D(1, -1.8189894e-12, 0, 0, 1, 3.7252903e-09, 0, 0, 1, 0, 0, 0)
+
+[node name="plate_iron_chest" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/spine_003/slot_chest" unique_id=1949235784 instance=ExtResource("6_c8p0i")]
+transform = Transform3D(1, 1.0004442e-11, 0, 5.7298166e-11, 1, -7.450581e-09, 0, -7.450581e-09, 1, 0, 0, 0)
+
+[node name="cloth_cotton_chest" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/spine_003/slot_chest" unique_id=1334226728 instance=ExtResource("8_s8wol")]
+visible = false
+
+[node name="foot_L" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton" index="2" unique_id=913009632]
+transform = Transform3D(0.9971276, 0.05370158, -0.030904345, 0.0083075985, -0.3523538, -0.9261856, -0.06577234, 0.9311266, -0.39060637, 0.33079115, 0.12785578, 0.15453798)
+
+[node name="char_mesh_003" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/foot_L" index="0" unique_id=1434028617]
+visible = false
+
+[node name="slot_foot_l" type="Node3D" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/foot_L" index="1" unique_id=1973914477]
+unique_name_in_owner = true
+transform = Transform3D(0.9962199, 0.031948123, -0.08906323, 0.09448903, -0.1942913, 0.97855747, 0.013574142, -0.9777258, -0.19482367, 0.0006620884, 0.013237953, 0.04807043)
+
+[node name="plate_iron_boot" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/foot_L/slot_foot_l" unique_id=149850311 instance=ExtResource("7_pqqny")]
+visible = false
+
+[node name="cloth_cotton_boot" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/foot_L/slot_foot_l" unique_id=715990549 instance=ExtResource("10_nirif")]
+
+[node name="foot_R" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton" index="3" unique_id=1507460057]
+transform = Transform3D(0.97206503, -0.22536093, 0.096219905, -0.0106347725, -0.37191856, -0.90797716, 0.23813163, 0.9210902, -0.36383006, -0.27618676, 0.13705866, -0.13641968)
+
+[node name="char_mesh_005" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/foot_R" index="0" unique_id=1932122393]
+visible = false
+
+[node name="slot_foot_r" type="Node3D" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/foot_R" index="1" unique_id=590499259]
+unique_name_in_owner = true
+transform = Transform3D(0.9925062, 0.085421704, -0.09792532, 0.114757195, -0.2078772, 0.9772867, 0.06527716, -0.96907, -0.20854643, 0.0015648603, 0.0005365405, -0.004647583)
+
+[node name="plate_iron_boot" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/foot_R/slot_foot_r" unique_id=173868130 instance=ExtResource("7_pqqny")]
+visible = false
+
+[node name="cloth_cotton_boot" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/foot_R/slot_foot_r" unique_id=1204589148 instance=ExtResource("10_nirif")]
+
+[node name="spine" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton" index="4" unique_id=210164438]
+transform = Transform3D(1, -0.0001855788, 0.00010848558, 0.00021315113, 0.92140484, -0.38860393, -2.7842492e-05, 0.38860393, 0.9214049, 8.738046e-06, 0.6276708, -0.050009962)
+
+[node name="char_mesh_001" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/spine" index="0" unique_id=1213538877]
+visible = false
+
+[node name="slot_belt" type="Node3D" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton/spine" index="1" unique_id=1428253084]
+transform = Transform3D(1, -0.00031954364, 0.00011010624, 0.00028670384, 0.97451895, 0.22430566, -0.00017897607, -0.22430559, 0.97451895, 7.1287723e-06, 0.043682456, -0.009807199)
+visible = false
+
+[node name="LookAtModifier3D" type="LookAtModifier3D" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton" index="5" unique_id=1176226315]
+target_node = NodePath("../../../../../../ArmContainer/LookTarget")
+bone_name = "Head"
+bone = 5
+
+[node name="LookAtModifier3D2" type="LookAtModifier3D" parent="ViewModel/character_model/metarig/GeneralSkeleton/RetargetModifier3D/OriginalSkeleton" index="6" unique_id=394971488]
+influence = 0.5
+target_node = NodePath("../../../../../../ArmContainer/LookTarget")
+bone_name = "Chest"
+bone = 2
+
+[node name="RightHandAttachment" type="BoneAttachment3D" parent="ViewModel/character_model/metarig/GeneralSkeleton" index="1" unique_id=512882923]
+transform = Transform3D(-0.5037611, -0.08009121, 0.86160105, -0.4589323, -0.7744078, -0.36660486, 0.7550313, -0.59986126, 0.36299157, -0.018225634, 1.1865697, 0.14946133)
+bone_name = "RightHand"
+bone_idx = 32
+
+[node name="slot_hand" type="Node3D" parent="ViewModel/character_model/metarig/GeneralSkeleton/RightHandAttachment" unique_id=1538123970]
+
+[node name="Anim" type="AnimationPlayer" parent="ViewModel/character_model" unique_id=942212641]
+root_node = NodePath("../metarig")
+libraries/MeleeLib = ExtResource("7_id8he")
+
+[node name="PostProcess" parent="ViewModel" unique_id=892692235 instance=ExtResource("8_q1g3e")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.327109)
+surface_material_override/0 = SubResource("ShaderMaterial_4mov0")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="ViewModel" unique_id=674699784]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.15471697)
+amount = 32
+lifetime = 2.0
+process_material = SubResource("ParticleProcessMaterial_nkc8p")
+draw_pass_1 = SubResource("QuadMesh_3c17b")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="ViewModel" unique_id=1916658420]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8476624, 0.10041666)
+shape = SubResource("SphereShape3D_ke0wg")
+spring_length = 0.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1366471246]
+libraries/ = SubResource("AnimationLibrary_px5sl")
+
+[node name="PoseBlendComponent" type="Node" parent="." unique_id=1573928410]
+script = ExtResource("8_3c17b")
+attack_curve = SubResource("Curve_pjt0s")
+attack_duration = 1.0
+strike_threshold = 0.75
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=978303819]
+
+[node name="Crosshair" type="ColorRect" parent="CanvasLayer" unique_id=1657302478]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -3.0
+offset_top = -3.0
+offset_right = 3.0
+offset_bottom = 3.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.6)
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=982020196]
+root_node = NodePath("../ViewModel/character_model/metarig")
+tree_root = SubResource("AnimationNodeBlendTree_ke0wg")
+anim_player = NodePath("../ViewModel/character_model/Anim")
+parameters/idle-run/blend_position = Vector2(0.0005787611, -0.007299304)
+parameters/StateMachine/BlendSpace2D/blend_position = Vector2(0, 0)
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="." unique_id=2011118932]
+
+[node name="Control" type="Control" parent="CanvasLayer2" unique_id=694086588]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Crosshair" type="ColorRect" parent="CanvasLayer2/Control" unique_id=480370816]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="InteractPrompt" type="AspectRatioContainer" parent="CanvasLayer2/Control" unique_id=1649006972]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.5
+offset_top = -11.5
+offset_right = 52.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer2/Control/InteractPrompt" unique_id=1822521350]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer2/Control/InteractPrompt/HBoxContainer" unique_id=1555934183]
+texture_filter = 1
+layout_mode = 2
+texture = SubResource("AtlasTexture_nirif")
+expand_mode = 2
+
+[node name="Label" type="Label" parent="CanvasLayer2/Control/InteractPrompt/HBoxContainer/TextureRect" unique_id=44711891]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "E"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="CanvasLayer2/Control/InteractPrompt/HBoxContainer" unique_id=1455722412]
+texture_filter = 1
+layout_mode = 2
+text = "Interact"
+
+[node name="UICanvas" parent="." unique_id=126230156 instance=ExtResource("15_pqqny")]
+
+[node name="Inventory" parent="." unique_id=938539161 instance=ExtResource("13_pqqny")]
+unique_name_in_owner = true
+
+[node name="StatsComponent" type="Node" parent="." unique_id=1580721149]
+script = ExtResource("14_ic7wx")
+base_stats = SubResource("Resource_s8ti4")
+
+[node name="ResourceComponent" type="Node" parent="." unique_id=151205610]
+script = ExtResource("19_ic7wx")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=409600646]
+replication_config = SubResource("SceneReplicationConfig_4r5pv")
+
+[editable path="ViewModel/character_model"]
+[editable path="UICanvas"]
+[editable path="UICanvas/InventoryControl/InventoryPanelContainer/VBoxContainer/MarginContainer/HBoxContainer/CharacterPreview"]

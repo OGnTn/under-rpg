@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dqi7x7bsiqlec"]
+
+[ext_resource type="ArrayMesh" uid="uid://brhipcu0n1fhb" path="res://assets/models/equipment/plate_iron_helmet.tres" id="1_sgc0p"]
+
+[node name="plate_iron_helmet" type="Node3D" unique_id=113848693]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=439160436]
+mesh = ExtResource("1_sgc0p")

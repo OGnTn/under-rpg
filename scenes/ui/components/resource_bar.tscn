@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://cdr27pxdjnjk0"]
+
+[ext_resource type="Theme" uid="uid://d2shdmbqhd2m6" path="res://assets/themes/base_theme.tres" id="1_trngl"]
+
+[node name="ResourceBar" type="ProgressBar" unique_id=1641347540]
+size_flags_vertical = 4
+theme = ExtResource("1_trngl")
+theme_type_variation = &"ProgressBarHealth"
+value = 36.85
+show_percentage = false

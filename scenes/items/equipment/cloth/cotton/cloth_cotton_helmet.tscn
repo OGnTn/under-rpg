@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://b08dadm3rsr4j"]
+
+[ext_resource type="ArrayMesh" uid="uid://m01brq5cdmnu" path="res://assets/models/equipment/cloth_cotton_helmet.tres" id="1_37di3"]
+
+[node name="cloth_cotton_helmet" type="Node3D" unique_id=445310787]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=893987373]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4608382, 0)
+mesh = ExtResource("1_37di3")

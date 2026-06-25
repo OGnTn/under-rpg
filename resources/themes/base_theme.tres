@@ -1,0 +1,67 @@
+[gd_resource type="Theme" format=3 uid="uid://d2shdmbqhd2m6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cxqc8"]
+bg_color = Color(0.16790001, 0.17721501, 0.23, 0.57254905)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.62352943)
+shadow_color = Color(0, 0, 0, 0.18039216)
+shadow_size = 2
+shadow_offset = Vector2(-2, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k4e0r"]
+bg_color = Color(0.16790001, 0.17721501, 0.23, 0.57254905)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.62352943)
+shadow_color = Color(0, 0, 0, 0.18039216)
+shadow_size = 2
+shadow_offset = Vector2(-2, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_es0n0"]
+bg_color = Color(0.16790001, 0.17721501, 0.23, 0.57254905)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.62352943)
+shadow_color = Color(0, 0, 0, 0.18039216)
+shadow_size = 2
+shadow_offset = Vector2(-2, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mchg"]
+bg_color = Color(0.16790001, 0.17721501, 0.23, 0.57254905)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.62352943)
+shadow_color = Color(0, 0, 0, 0.18039216)
+shadow_size = 2
+shadow_offset = Vector2(-2, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ty7gv"]
+bg_color = Color(0.4967383, 0.040420614, 4.813075e-08, 0.57254905)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.62352943)
+shadow_color = Color(0, 0, 0, 0.18039216)
+shadow_offset = Vector2(-2, 2)
+
+[resource]
+MarginContainer/constants/margin_bottom = 15
+MarginContainer/constants/margin_left = 15
+MarginContainer/constants/margin_right = 15
+MarginContainer/constants/margin_top = 15
+Panel/styles/panel = SubResource("StyleBoxFlat_cxqc8")
+PanelContainer/styles/panel = SubResource("StyleBoxFlat_k4e0r")
+ProgressBar/styles/background = SubResource("StyleBoxFlat_es0n0")
+ProgressBar/styles/fill = SubResource("StyleBoxFlat_7mchg")
+ProgressBarHealth/base_type = &"ProgressBar"
+ProgressBarHealth/styles/fill = SubResource("StyleBoxFlat_ty7gv")

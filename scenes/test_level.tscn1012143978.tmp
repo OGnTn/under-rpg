@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dt2u3isx7kkmb"]
+
+[ext_resource type="PackedScene" uid="uid://4o48k7mmq7v3" path="res://scenes/entities/chicken.tscn" id="1_paw1w"]
+[ext_resource type="PackedScene" uid="uid://cgumy61g26e47" path="res://scenes/player.tscn" id="2_j6w7d"]
+
+[node name="Node3D" type="Node3D" unique_id=571859299]
+
+[node name="NeutralMob" parent="." unique_id=1342851266 instance=ExtResource("1_paw1w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.44098806, 1.1920929e-07, 0.30738425)
+
+[node name="Player" parent="." unique_id=365988748 instance=ExtResource("2_j6w7d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4981889, -1.1920929e-07, 1.2701638)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1870542536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.205719, -0.5591676, 0.15078735)
+use_collision = true
+size = Vector3(19.980896, 1, 12.7724)

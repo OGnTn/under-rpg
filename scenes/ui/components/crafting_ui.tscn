@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://bdjkcw70040am"]
+
+[ext_resource type="Script" uid="uid://daec4thdtj1mi" path="res://scripts/systems/crafting-ui/crafting_ui.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://mcvcx75nkrrn" path="res://scenes/ui/components/recipe_card.tscn" id="2_card"]
+[ext_resource type="PackedScene" uid="uid://cu2jqbijc16v0" path="res://scripts/systems/inventory/item_cell.tscn" id="3_cell"]
+
+[node name="CraftingUI" type="PanelContainer" unique_id=1499812368]
+custom_minimum_size = Vector2(300, 400)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1620.0
+offset_bottom = -680.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_script")
+recipe_card_scene = ExtResource("2_card")
+item_cell_scene = ExtResource("3_cell")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=345986683]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=1546855773]
+layout_mode = 2
+text = "Crafting"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer" unique_id=1123377549]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RecipeListContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer" unique_id=2117082760]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 5

@@ -1,0 +1,122 @@
+[gd_scene format=3 uid="uid://clro7cny7vox0"]
+
+[ext_resource type="Script" uid="uid://bti1m3ohgol4j" path="res://scripts/channeled_beam_weapon.gd" id="1_pjayf"]
+[ext_resource type="PackedScene" uid="uid://bbyossld0j7kl" path="res://entities/torch/torch.tscn" id="2_egcfb"]
+[ext_resource type="Script" uid="uid://od05482x6b5k" path="res://scripts/weapon_attack_definition.gd" id="2_qaiv2"]
+[ext_resource type="Script" uid="uid://tqxw5pmq5srq" path="res://scripts/weapon_pose_key.gd" id="3_aidwb"]
+[ext_resource type="Script" uid="uid://d3m5usg562an8" path="res://scripts/weapon_definition.gd" id="3_ic3wl"]
+
+[sub_resource type="Curve" id="Curve_ic3wl"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Resource" id="Resource_aidwb"]
+script = ExtResource("3_aidwb")
+animation_name = &"r_rest"
+metadata/_custom_type_script = "uid://tqxw5pmq5srq"
+
+[sub_resource type="Resource" id="Resource_xrdjo"]
+script = ExtResource("3_aidwb")
+progress = 1.0
+animation_name = &"channel_pose"
+metadata/_custom_type_script = "uid://tqxw5pmq5srq"
+
+[sub_resource type="Resource" id="Resource_qaiv2"]
+script = ExtResource("2_qaiv2")
+attack_name = &"shoot"
+pose_keys = Array[ExtResource("3_aidwb")]([SubResource("Resource_aidwb"), SubResource("Resource_xrdjo")])
+duration = 1.5
+curve = SubResource("Curve_ic3wl")
+metadata/_custom_type_script = "uid://od05482x6b5k"
+
+[sub_resource type="Resource" id="Resource_pqqny"]
+script = ExtResource("3_ic3wl")
+weapon_name = &"fire_wand"
+draw_animation = &"channel_pose"
+attacks = Array[ExtResource("2_qaiv2")]([SubResource("Resource_qaiv2")])
+metadata/_custom_type_script = "uid://d3m5usg562an8"
+
+[sub_resource type="Curve" id="Curve_qaiv2"]
+_data = [Vector2(0.51153845, 0.9860614), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_1dgs8"]
+curve = SubResource("Curve_qaiv2")
+
+[sub_resource type="Gradient" id="Gradient_ic3wl"]
+offsets = PackedFloat32Array(0, 0.16194332, 0.4493927, 0.68016195)
+colors = PackedColorArray(0.7545578, 0.04204437, 2.8878452e-07, 1, 0.79916775, 0.19964576, 0.07339369, 1, 0.8628448, 0.42460904, 0.17815685, 1, 0.94, 0.84599996, 0.235, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_wj3kb"]
+gradient = SubResource("Gradient_ic3wl")
+
+[sub_resource type="Curve" id="Curve_aidwb"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_muoke"]
+curve = SubResource("Curve_aidwb")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xrdjo"]
+direction = Vector3(0, 1, 0)
+spread = 2.0
+initial_velocity_max = 10.0
+gravity = Vector3(0, 0, 0)
+color_ramp = SubResource("GradientTexture1D_wj3kb")
+alpha_curve = SubResource("CurveTexture_1dgs8")
+emission_curve = SubResource("CurveTexture_muoke")
+
+[sub_resource type="Gradient" id="Gradient_1pkwr"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.3995984, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_li2fo"]
+gradient = SubResource("Gradient_1pkwr")
+fill = 1
+fill_from = Vector2(0.5, 0.4957265)
+fill_to = Vector2(0.89316237, 0.14957266)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w4atn"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_texture = SubResource("GradientTexture2D_li2fo")
+billboard_mode = 1
+
+[sub_resource type="QuadMesh" id="QuadMesh_01ksm"]
+material = SubResource("StandardMaterial3D_w4atn")
+size = Vector2(0.2, 0.2)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ke0wg"]
+
+[node name="fire_wand" type="Node3D" unique_id=540787873 node_paths=PackedStringArray("channeled_hurtbox", "beam_visual")]
+script = ExtResource("1_pjayf")
+channeled_hurtbox = NodePath("Area3D")
+beam_visual = NodePath("Visuals/Node3D")
+muzzle_path = NodePath("Visuals/Torch/Muzzle")
+definition = SubResource("Resource_pqqny")
+
+[node name="Visuals" type="Node3D" parent="." unique_id=199397303]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15848714, 0)
+
+[node name="Torch" parent="Visuals" unique_id=1920996628 instance=ExtResource("2_egcfb")]
+
+[node name="Muzzle" type="Node3D" parent="Visuals/Torch" unique_id=928564900]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.43411613, 0)
+
+[node name="Node3D" type="Node3D" parent="Visuals" unique_id=2135300265]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.015102148, 0.48742884, 0)
+
+[node name="Beam" type="GPUParticles3D" parent="Visuals/Node3D" unique_id=1699365439]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
+amount = 64
+process_material = SubResource("ParticleProcessMaterial_xrdjo")
+draw_pass_1 = SubResource("QuadMesh_01ksm")
+
+[node name="Area3D" type="Area3D" parent="." unique_id=1619096035]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D" unique_id=1893212058]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3875345, 0)
+shape = SubResource("CylinderShape3D_ke0wg")
+debug_color = Color(0.8074819, 0.34268248, 0.6077297, 0.41960785)

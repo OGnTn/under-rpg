@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://dqq67bu7bokkt"]
+
+[ext_resource type="ArrayMesh" uid="uid://b7g7csb2yjnoa" path="res://assets/models/equipment/cloth_cotton_chest.tres" id="1_kveck"]
+
+[node name="cloth_cotton_chest" type="Node3D" unique_id=1334226728]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=636537851]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.20548958, 0)
+mesh = ExtResource("1_kveck")

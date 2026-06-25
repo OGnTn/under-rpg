@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://v0dxh6qrry6v"]
+
+[ext_resource type="Script" path="res://scripts/hit_particles.gd" id="1_hit_particles_gd"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_particles"]
+shading_mode = 0
+albedo_color = Color(1, 0.4, 0.1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_particles"]
+material = SubResource("StandardMaterial3D_particles")
+size = Vector3(0.06, 0.06, 0.06)
+
+[node name="HitParticles" type="CPUParticles3D"]
+emitting = false
+amount = 15
+lifetime = 0.4
+one_shot = true
+explosiveness = 1.0
+mesh = SubResource("BoxMesh_particles")
+direction = Vector3(0, 0, 1)
+spread = 35.0
+gravity = Vector3(0, -6, 0)
+initial_velocity_min = 3.0
+initial_velocity_max = 6.0
+scale_amount_min = 0.5
+scale_amount_max = 1.2
+script = ExtResource("1_hit_particles_gd")

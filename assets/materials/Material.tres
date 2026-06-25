@@ -1,0 +1,27 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cm0tgx0l8ylh1"]
+
+[ext_resource type="Texture2D" uid="uid://dmwtwehpnpsn0" path="res://assets/textures/resurrect-64.png" id="1_iydsx"]
+
+[sub_resource type="Gradient" id="Gradient_iydsx"]
+offsets = PackedFloat32Array(0.99722606, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_4okq3"]
+gradient = SubResource("Gradient_iydsx")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_iydsx"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_4okq3"]
+noise = SubResource("FastNoiseLite_iydsx")
+as_normal_map = true
+
+[resource]
+resource_name = "Material"
+cull_mode = 2
+diffuse_mode = 3
+specular_mode = 1
+albedo_texture = ExtResource("1_iydsx")
+roughness = 0.0
+normal_enabled = true
+normal_scale = 1.45
+normal_texture = SubResource("NoiseTexture2D_4okq3")
+detail_mask = SubResource("GradientTexture1D_4okq3")

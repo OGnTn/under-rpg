@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://bskou0i74pnr0"]
+
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="1_2ufop"]
+[ext_resource type="Texture2D" uid="uid://ck0ho5s7i0riw" path="res://assets/textures/items/icons/icon_oak_bow.png" id="1_axim0"]
+[ext_resource type="PackedScene" uid="uid://clro7cny7vox0" path="res://scenes/items/weapons/fire_wand.tscn" id="2_cumo0"]
+
+[resource]
+script = ExtResource("1_2ufop")
+item_types = 1
+name = "Fire wand"
+description = "miauw"
+icon = ExtResource("1_axim0")
+scene = ExtResource("2_cumo0")
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"

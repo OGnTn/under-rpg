@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://cu2jqbijc16v0"]
+
+[ext_resource type="Theme" uid="uid://d2shdmbqhd2m6" path="res://resources/themes/base_theme.tres" id="1_uq7x8"]
+[ext_resource type="Texture2D" uid="uid://cts1mxclnv1oh" path="res://icon.svg" id="2_4wkd2"]
+[ext_resource type="Script" uid="uid://ilwlax41nid3" path="res://scripts/systems/inventory-ui/item_cell.gd" id="2_f4b6v"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_avmd0"]
+diffuse_texture = ExtResource("2_4wkd2")
+
+[node name="ItemCell" type="PanelContainer" unique_id=541804252]
+custom_minimum_size = Vector2(64, 64)
+custom_maximum_size = Vector2(72, 72)
+offset_right = 72.0
+offset_bottom = 72.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_uq7x8")
+script = ExtResource("2_f4b6v")
+
+[node name="ItemIcon" type="TextureRect" parent="." unique_id=2018206151]
+layout_mode = 2
+texture = SubResource("CanvasTexture_avmd0")
+expand_mode = 5
+stretch_mode = 4
+
+[node name="ItemCount" type="Label" parent="ItemIcon" unique_id=1000218247]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -19.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "10"
+horizontal_alignment = 1
+
+[connection signal="gui_input" from="." to="." method="_on_gui_event"]
+[connection signal="mouse_entered" from="." to="." method="_on_started_hovering"]
+[connection signal="mouse_exited" from="." to="." method="_on_stopped_hovering"]

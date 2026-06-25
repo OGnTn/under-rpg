@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://cvsyjdn844b1w"]
+
+[ext_resource type="Script" uid="uid://b8lm6ykungkyu" path="res://entities/world_item/world_item.gd" id="1_0w8wl"]
+[ext_resource type="ArrayMesh" uid="uid://d0pfd57caenmb" path="res://entities/items/item_oak_logs/mesh_oak_logs.res" id="1_g60ei"]
+[ext_resource type="Script" uid="uid://m8tib6vypnmg" path="res://entities/interactable/interactable.gd" id="3_wsb03"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0w8wl"]
+
+[node name="WorldItem" type="Area3D" unique_id=2138454859]
+script = ExtResource("1_0w8wl")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=770874169]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.30451074, 0)
+mesh = ExtResource("1_g60ei")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1597115762]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.30451074, 0)
+shape = SubResource("BoxShape3D_0w8wl")
+
+[node name="RayCast3D" type="RayCast3D" parent="." unique_id=888366441]
+target_position = Vector3(0, -0.5, 0)
+
+[node name="Interactable" type="Area3D" parent="." unique_id=1404193629]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.30451074, 0)
+monitoring = false
+script = ExtResource("3_wsb03")
+prompt_message = "Pick up"
+metadata/_custom_type_script = "uid://m8tib6vypnmg"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactable" unique_id=1379155852]
+shape = SubResource("BoxShape3D_0w8wl")
+
+[connection signal="interacted" from="Interactable" to="." method="pick_up"]

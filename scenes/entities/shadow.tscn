@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cohu4d052adbb"]
+
+[sub_resource type="Gradient" id="Gradient_onntj"]
+offsets = PackedFloat32Array(0.408693, 0.92927, 0.993056)
+colors = PackedColorArray(0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_h7bdk"]
+gradient = SubResource("Gradient_onntj")
+fill = 1
+fill_from = Vector2(0.514957, 0.50812)
+fill_to = Vector2(0.843162, 0.145727)
+
+[node name="Shadow" type="Decal"]
+size = Vector3(1.64099, 2.68213, 2)
+texture_albedo = SubResource("GradientTexture2D_h7bdk")

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dc5gdf8koxq54"]
+
+[ext_resource type="Script" uid="uid://csebk313cxuc7" path="res://scripts/instant_projectile_weapon.gd" id="1_bsfy4"]
+[ext_resource type="PackedScene" uid="uid://cnofkamasr3x4" path="res://scenes/projectiles/arrow.tscn" id="2_xxon4"]
+[ext_resource type="Resource" uid="uid://qkh1eo4xen1i" path="res://resources/wand_definition.tres" id="3_2qkql"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_tqelj"]
+size = Vector3(0.07, 0.6, 0.07)
+
+[node name="Wand" type="Node3D" unique_id=188722318]
+script = ExtResource("1_bsfy4")
+fire_on_event = true
+projectile_scene = ExtResource("2_xxon4")
+muzzle_path = NodePath("Visuals/Muzzle")
+definition = ExtResource("3_2qkql")
+
+[node name="Visuals" type="Node3D" parent="." unique_id=1953226504]
+
+[node name="Muzzle" type="Node3D" parent="Visuals" unique_id=1442978642]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45547414, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Visuals" unique_id=346693594]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.20594835, 0)
+mesh = SubResource("BoxMesh_tqelj")

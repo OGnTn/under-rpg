@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://cv10locnubdxy"]
+
+[ext_resource type="Script" uid="uid://c387b8p4253ml" path="res://scripts/systems/inventory/chest.gd" id="1_bbmqp"]
+[ext_resource type="ArrayMesh" uid="uid://b78g8wig5c3cw" path="res://assets/models/objects/mesh_chest.res" id="2_ektp4"]
+[ext_resource type="Script" uid="uid://o0q11l60gam4" path="res://scripts/systems/inventory/inventory.gd" id="3_32syd"]
+[ext_resource type="Script" uid="uid://ywekou81er6x" path="res://scripts/systems/entities/interactable.gd" id="4_ektp4"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ektp4"]
+size = Vector3(1.3529911, 0.8221283, 0.7994995)
+
+[sub_resource type="Animation" id="Animation_y8sn2"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:blend_shapes/Open")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_7ula6"]
+resource_name = "open_close"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:blend_shapes/Open")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qfjon"]
+_data = {
+&"RESET": SubResource("Animation_y8sn2"),
+&"open_close": SubResource("Animation_7ula6")
+}
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0p1s4"]
+size = Vector3(2.0678253, 0.8659363, 1.0908203)
+
+[node name="Chest" type="Node3D" unique_id=191129029]
+script = ExtResource("1_bbmqp")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=785843812]
+mesh = ExtResource("2_ektp4")
+blend_shapes/Open = 0.0
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=63918054]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1927552390]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.010632515, 0.3558731, -0.00045776367)
+shape = SubResource("BoxShape3D_ektp4")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=312733793]
+libraries/ = SubResource("AnimationLibrary_qfjon")
+
+[node name="Inventory" type="Node" parent="." unique_id=654453135]
+script = ExtResource("3_32syd")
+hotbar_size = 0
+metadata/_custom_type_script = "uid://o0q11l60gam4"
+
+[node name="Interactable" type="Area3D" parent="." unique_id=857122683]
+script = ExtResource("4_ektp4")
+prompt_message = "Open Chest"
+metadata/_custom_type_script = "uid://m8tib6vypnmg"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactable" unique_id=1024702750]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.006828308, 0.4337963, 0.045410156)
+shape = SubResource("BoxShape3D_0p1s4")
+
+[connection signal="interacted" from="Interactable" to="." method="_on_interactable_interacted"]

@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://dt2u3isx7kkmb"]
+
+[ext_resource type="PackedScene" uid="uid://4o48k7mmq7v3" path="res://scenes/entities/chicken.tscn" id="1_paw1w"]
+[ext_resource type="PackedScene" uid="uid://cgumy61g26e47" path="res://scenes/player.tscn" id="2_j6w7d"]
+[ext_resource type="Material" uid="uid://btlktlxgioejq" path="res://assets/materials/prototype_ground.tres" id="2_paw1w"]
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_ke0wg"]
+vertices = PackedVector3Array(-24.5, 0, -24.5, -24.5, 0, 24.5, 24.5, 0, 24.5, 24.5, 0, -24.5)
+polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1)]
+
+[node name="Node3D" type="Node3D" unique_id=571859299]
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=1207766273]
+navigation_mesh = SubResource("NavigationMesh_ke0wg")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D" unique_id=1870542536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+use_collision = true
+size = Vector3(50, 1, 50)
+material = ExtResource("2_paw1w")
+
+[node name="Player" parent="." unique_id=365988748 instance=ExtResource("2_j6w7d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4901233, 0.6908319, 6.3894167)
+
+[node name="NeutralMob" parent="." unique_id=1342851266 instance=ExtResource("1_paw1w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/items/equipment/cloth/cotton/cloth_cotton_helmet.tscn" id="1_scene"]
+[ext_resource type="Script" path="res://systems/inventory/equipment_item.gd" id="2_script"]
+[ext_resource type="Texture2D" path="res://icon.png" id="3_icon"]
+
+[resource]
+script = ExtResource("2_script")
+slot_type = 0
+item_types = 8
+name = "Cloth Helmet"
+description = "A basic cotton cloth helmet."
+icon = ExtResource("3_icon")
+scene = ExtResource("1_scene")
+max_stack = 1

@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dq1l6edyyvd68"]
+
+[ext_resource type="ArrayMesh" uid="uid://td0ompudeolg" path="res://assets/models/equipment/cloth_cotton_boot.tres" id="1_lj7nt"]
+
+[node name="cloth_cotton_boot" type="Node3D" unique_id=715990549]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=893728834]
+mesh = ExtResource("1_lj7nt")

@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://dg34mt40nokny"]
+
+[ext_resource type="ArrayMesh" uid="uid://bfkrwhrefqss7" path="res://assets/models/equipment/plate_iron_boot.tres" id="1_b5coq"]
+
+[node name="plate_iron_boot" type="Node3D" unique_id=149850311]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1617602034]
+mesh = ExtResource("1_b5coq")

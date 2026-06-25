@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://b5234w4cureuk"]
+
+[ext_resource type="Texture2D" uid="uid://ck0ho5s7i0riw" path="res://assets/textures/items/icons/icon_oak_bow.png" id="1_3bywj"]
+[ext_resource type="PackedScene" uid="uid://fm5b1dssjuyr" path="res://scenes/items/weapons/bow.tscn" id="3_araw0"]
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="4_pw78c"]
+
+[resource]
+script = ExtResource("4_pw78c")
+item_types = 1
+name = "Oak Bow"
+description = "rag"
+icon = ExtResource("1_3bywj")
+scene = ExtResource("3_araw0")
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"
