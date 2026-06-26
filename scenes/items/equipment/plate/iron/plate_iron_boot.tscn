@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://dg34mt40nokny"]
 
-[ext_resource type="ArrayMesh" uid="uid://bfkrwhrefqss7" path="res://assets/models/equipment/plate_iron_boot.tres" id="1_b5coq"]
+[ext_resource type="ArrayMesh" uid="uid://bduto6paxg5rj" path="res://assets/models/equipment/plate_iron_boot.tres" id="1_b5coq"]
+[ext_resource type="Material" uid="uid://cm0tgx0l8ylh1" path="res://assets/materials/Material.tres" id="2_ko3vm"]
 
 [node name="plate_iron_boot" type="Node3D" unique_id=149850311]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1617602034]
 mesh = ExtResource("1_b5coq")
+surface_material_override/0 = ExtResource("2_ko3vm")

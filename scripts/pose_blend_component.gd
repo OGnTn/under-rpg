@@ -20,10 +20,9 @@ signal attack_event_triggered
 
 # Node References
 @export_group("References")
-@export var target_node_path: NodePath
-@export var animation_player_path: NodePath
-
+@export
 var target_node: Node3D
+@export
 var animation_player: AnimationPlayer
 var active_weapon: WeaponDefinition
 var active_hurtbox: Area3D
@@ -52,7 +51,6 @@ func set_channel_state(attack: WeaponAttackDefinition, progress: float) -> void:
 	channel_progress = progress
 
 func _ready() -> void:
-	_resolve_nodes()
 	
 	if not attack_curve:
 		attack_curve = Curve.new()
@@ -60,17 +58,6 @@ func _ready() -> void:
 		attack_curve.add_point(Vector2(1, 1))
 	
 	_set_weapon(weapon_definition)
-
-func _resolve_nodes() -> void:
-	if target_node_path:
-		target_node = get_node_or_null(target_node_path)
-	else:
-		target_node = get_node_or_null("../ViewModel/ArmContainer/ArmPivot")
-			
-	if animation_player_path:
-		animation_player = get_node_or_null(animation_player_path)
-	else:
-		animation_player = get_node_or_null("../AnimationPlayer")
 
 func set_weapon(new_weapon: WeaponDefinition) -> void:
 	_set_weapon(new_weapon)
