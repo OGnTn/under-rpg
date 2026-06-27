@@ -29,6 +29,11 @@ func _ready() -> void:
 	else:
 		push_warning("HUDControl: ResourceComponent not found on parent/owner.")
 
+func _process(delta: float) -> void:
+	_update_health(resource_component.current_health, resource_component.max_health)
+	_update_mana(resource_component.current_mana, resource_component.max_mana)
+	_update_mana(resource_component.current_stamina, resource_component.max_stamina)
+
 func _on_health_changed(_old_val: int, new_val: int) -> void:
 	if resource_component:
 		_update_health(new_val, resource_component.max_health)

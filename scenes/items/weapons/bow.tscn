@@ -1,10 +1,10 @@
 [gd_scene format=4 uid="uid://fm5b1dssjuyr"]
 
-[ext_resource type="Script" uid="uid://b3fcjpsjo1wm6" path="res://scripts/charge_weapon.gd" id="1_prjx1"]
+[ext_resource type="Script" uid="uid://ccxqdsr5lpbi4" path="res://scripts/charge_weapon.gd" id="1_prjx1"]
 [ext_resource type="PackedScene" uid="uid://cnofkamasr3x4" path="res://scenes/projectiles/arrow.tscn" id="2_rivji"]
-[ext_resource type="Script" uid="uid://od05482x6b5k" path="res://scripts/weapon_attack_definition.gd" id="3_atxj4"]
-[ext_resource type="Script" uid="uid://d3m5usg562an8" path="res://scripts/weapon_definition.gd" id="4_oxltw"]
-[ext_resource type="Script" uid="uid://tqxw5pmq5srq" path="res://scripts/weapon_pose_key.gd" id="4_uma3s"]
+[ext_resource type="Script" uid="uid://gwasg2o1cwub" path="res://scripts/weapon_attack_definition.gd" id="3_atxj4"]
+[ext_resource type="Script" uid="uid://bxsyumhpord72" path="res://scripts/weapon_definition.gd" id="4_oxltw"]
+[ext_resource type="Script" uid="uid://cbxlbjronabvs" path="res://scripts/weapon_pose_key.gd" id="4_uma3s"]
 
 [sub_resource type="Curve" id="Curve_rpuhq"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
@@ -13,33 +13,28 @@ point_count = 2
 [sub_resource type="Resource" id="Resource_15scw"]
 script = ExtResource("4_uma3s")
 animation_name = &"r_rest"
-metadata/_custom_type_script = "uid://tqxw5pmq5srq"
 
 [sub_resource type="Resource" id="Resource_tdikv"]
 script = ExtResource("4_uma3s")
 progress = 0.25
 animation_name = &"bow_windup"
-metadata/_custom_type_script = "uid://tqxw5pmq5srq"
 
 [sub_resource type="Resource" id="Resource_yasbj"]
 script = ExtResource("4_uma3s")
 progress = 0.75
 animation_name = &"bow_strike"
-metadata/_custom_type_script = "uid://tqxw5pmq5srq"
 
 [sub_resource type="Resource" id="Resource_ji0pi"]
 script = ExtResource("3_atxj4")
 pose_keys = Array[ExtResource("4_uma3s")]([SubResource("Resource_15scw"), SubResource("Resource_tdikv"), SubResource("Resource_yasbj")])
 duration = 1.0
 curve = SubResource("Curve_rpuhq")
-metadata/_custom_type_script = "uid://od05482x6b5k"
 
 [sub_resource type="Resource" id="Resource_0dpix"]
 script = ExtResource("4_oxltw")
 weapon_name = &"bow"
 draw_animation = &"bow_windup"
 attacks = Array[ExtResource("3_atxj4")]([SubResource("Resource_ji0pi")])
-metadata/_custom_type_script = "uid://d3m5usg562an8"
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wki4p"]
 resource_name = "m_bow"

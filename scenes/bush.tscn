@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://crb2uueb6mcpj"]
+
+[ext_resource type="PackedScene" uid="uid://dcq3t6ayooks" path="res://assets/models/objects/bush.blend" id="1_lad4k"]
+[ext_resource type="Script" uid="uid://ugmxxk0puvad" path="res://scripts/systems/entities/object_react_component.gd" id="2_ehqem"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ke0wg"]
+radius = 0.72254926
+
+[node name="bush" unique_id=1653162554 instance=ExtResource("1_lad4k")]
+
+[node name="ObjectReactComponent" type="Area3D" parent="." index="1" unique_id=1660928949 node_paths=PackedStringArray("target")]
+script = ExtResource("2_ehqem")
+target = NodePath("../Cube")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ObjectReactComponent" index="0" unique_id=1868645217]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65088046, 0)
+shape = SubResource("SphereShape3D_ke0wg")
