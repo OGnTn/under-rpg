@@ -1,223 +1,164 @@
-class_name PoseBlendComponent extends Node
+extends AnimationPlayer
+class_name PoseBlendComponent
 
-## PoseBlendComponent
-## Manages modular weapon attack poses, blend timing, and strike windows.
+## Procedural pose player for the view-model arm pivot.
 
-signal strike_landed
-signal attack_event_triggered
+signal marker_reached(marker_name: StringName, animation_name: StringName)
 
-# Attack Settings
-@export_group("Attack Settings")
-@export var attack_curve: Curve
-@export var attack_duration: float = 0.5
-@export_range(0.0, 1.0) var windup_threshold: float = 0.25
-@export_range(0.0, 1.0) var strike_threshold: float = 0.5
-@export var attack_enthusiasm: float = 1.0
+@export_group("Defaults")
+@export var default_duration: float = 0.5
+@export var default_curve: Curve
+@export var default_enthusiasm: float = 1.0
 
-# Weapon Data
-@export_group("Weapon")
-@export var weapon_definition: WeaponDefinition
-
-# Node References
 @export_group("References")
-@export
-var target_node: Node3D
-@export
-var animation_player: AnimationPlayer
-var active_weapon: WeaponDefinition
-var active_hurtbox: Area3D
+@export var animation_root_path: NodePath = NodePath("..")
+@export var target_node: Node3D
 
-# Resolved Pose Data
-var rest_pose: Dictionary = {"position": Vector3(0.6, 1.3, -0.8), "rotation": Vector3.ZERO}
-var resolved_attacks: Dictionary = {}
-
-# Draw Tracking
-var is_drawing: bool = false
-var draw_amount: float = 0.0
+var rest_pose: Dictionary = {
+	"position": Vector3(0.6, 1.3, -0.8),
+	"rotation": Vector3.ZERO
+}
 var draw_pose: Dictionary = {}
+var draw_amount: float = 0.0
 
-# Attack Tracking
-var is_attacking: bool = false
-var attack_time: float = 0.0
-var current_attack_type: StringName = &"regular"
-var strike_emitted: bool = false
-
-# Channel Tracking
-var channel_attack: WeaponAttackDefinition = null
-var channel_progress: float = 0.0
-
-func set_channel_state(attack: WeaponAttackDefinition, progress: float) -> void:
-	channel_attack = attack
-	channel_progress = progress
+var _animations: Dictionary = {}
+var _resolved_poses: Dictionary = {}
+var _current_animation: WeaponAttackDefinition
+var _current_animation_name: StringName = &""
+var _playback_time: float = 0.0
+var _progress: float = 0.0
+var _playing: bool = false
+var _event_marker_emitted: bool = false
+var _manual_pose_active: bool = false
 
 func _ready() -> void:
-	
-	if not attack_curve:
-		attack_curve = Curve.new()
-		attack_curve.add_point(Vector2(0, 0))
-		attack_curve.add_point(Vector2(1, 1))
-	
-	_set_weapon(weapon_definition)
+	if not default_curve:
+		default_curve = Curve.new()
+		default_curve.add_point(Vector2(0.0, 0.0))
+		default_curve.add_point(Vector2(1.0, 1.0))
+	draw_pose = rest_pose.duplicate()
+	_apply_pose(rest_pose)
 
-func set_weapon(new_weapon: WeaponDefinition) -> void:
-	_set_weapon(new_weapon)
-
-func _set_weapon(new_weapon: WeaponDefinition) -> void:
-	active_weapon = new_weapon if new_weapon else _create_legacy_weapon()
-	weapon_definition = new_weapon
-	resolved_attacks.clear()
-	
-	rest_pose = _load_pose_from_anim(
-		String(active_weapon.rest_animation),
-		active_weapon.rest_position,
-		active_weapon.rest_rotation
-	)
-	
-	if active_weapon and &"draw_animation" in active_weapon and not String(active_weapon.draw_animation).is_empty():
-		draw_pose = _load_pose_from_anim(
-			String(active_weapon.draw_animation),
-			rest_pose.position,
-			rest_pose.rotation
-		)
-	else:
+func set_rest_pose(animation_name: StringName, fallback_position: Vector3, fallback_rotation: Vector3) -> void:
+	rest_pose = _load_pose_from_animation(String(animation_name), fallback_position, fallback_rotation)
+	if draw_pose.is_empty():
 		draw_pose = rest_pose.duplicate()
-		
-	_resolve_hurtbox()
-	
-	if not is_attacking and not is_drawing:
+	if not _playing and draw_amount <= 0.0:
 		_apply_pose(rest_pose)
 
-func _create_legacy_weapon() -> WeaponDefinition:
-	var weapon := WeaponDefinition.new()
-	weapon.weapon_name = &"legacy_sword"
-	weapon.hurtbox_path = NodePath("../ViewModel/ArmContainer/ArmPivot/Arm/Sword/Hurtbox")
-	weapon.rest_animation = &"r_rest"
-	weapon.rest_position = Vector3(0.6, 1.3, -0.8)
-	weapon.rest_rotation = Vector3.ZERO
-	weapon.default_attack = &"regular"
-	weapon.attacks = [
-		_create_legacy_attack(&"regular", &"r_windup", &"r_strike"),
-		_create_legacy_attack(&"downward", &"u_windup", &"u_strike")
-	]
-	return weapon
-
-
-func _create_legacy_attack(
-	attack_name: StringName,
-	windup_animation: StringName,
-	strike_animation: StringName
-) -> WeaponAttackDefinition:
-	var attack := WeaponAttackDefinition.new()
-	attack.attack_name = attack_name
-	attack.strike_start = windup_threshold
-	attack.strike_end = strike_threshold
-	attack.strike_event_time = strike_threshold
-	attack.pose_keys = [
-		_create_pose_key(0.0, &"r_rest"),
-		_create_pose_key(windup_threshold, windup_animation),
-		_create_pose_key(strike_threshold, strike_animation),
-		_create_pose_key(1.0, &"r_rest")
-	]
-	return attack
-
-func _create_pose_key(progress: float, animation_name: StringName) -> WeaponPoseKey:
-	var key := WeaponPoseKey.new()
-	key.progress = progress
-	key.animation_name = animation_name
-	key.load_from_animation = true
-	return key
-
-func _resolve_hurtbox() -> void:
-	active_hurtbox = null
-	if not active_weapon or active_weapon.hurtbox_path.is_empty():
+func set_draw_pose(animation_name: StringName) -> void:
+	if String(animation_name).is_empty():
+		draw_pose = rest_pose.duplicate()
 		return
-	active_hurtbox = get_node_or_null(active_weapon.hurtbox_path) as Area3D
+	draw_pose = _load_pose_from_animation(String(animation_name), rest_pose.position, rest_pose.rotation)
 
-func get_hurtbox() -> Area3D:
-	return active_hurtbox
+func clear_animations() -> void:
+	_animations.clear()
+	_resolved_poses.clear()
+	stop_pose()
 
-func _load_pose_from_anim(
-	anim_name: String,
-	fallback_position: Vector3 = Vector3(0.6, 1.3, -0.8),
-	fallback_rotation: Vector3 = Vector3.ZERO
-) -> Dictionary:
-	var pose = {
-		"position": fallback_position,
-		"rotation": fallback_rotation
-	}
-	
-	if anim_name.is_empty() or not animation_player or not animation_player.has_animation(anim_name) or not target_node:
-		return pose
-		
-	var anim := animation_player.get_animation(anim_name)
-	var root_node := animation_player.get_node(animation_player.root_node)
-	var relative_path := root_node.get_path_to(target_node)
-	var pos_track_path := str(relative_path) + ":position"
-	var rot_track_path := str(relative_path) + ":rotation"
-	var pos_track := anim.find_track(pos_track_path, Animation.TYPE_VALUE)
-	var rot_track := anim.find_track(rot_track_path, Animation.TYPE_VALUE)
-	
-	if pos_track != -1 and anim.track_get_key_count(pos_track) > 0:
-		pose.position = anim.track_get_key_value(pos_track, 0)
-		
-	if rot_track != -1 and anim.track_get_key_count(rot_track) > 0:
-		pose.rotation = anim.track_get_key_value(rot_track, 0)
-		
-	return pose
+func add_animation_clip(animation: WeaponAttackDefinition) -> void:
+	if not animation:
+		return
+	_animations[animation.attack_name] = animation
+	_resolved_poses.erase(animation.attack_name)
+
+func set_animation_clips(animations: Array[WeaponAttackDefinition]) -> void:
+	_animations.clear()
+	_resolved_poses.clear()
+	for animation in animations:
+		add_animation_clip(animation)
+
+func has_pose_animation(animation_name: StringName) -> bool:
+	return _animations.has(animation_name)
+
+func play_pose(animation_name: StringName = &"", custom_blend: float = -1.0, custom_speed: float = 1.0, from_end: bool = false) -> void:
+	if not _animations.has(animation_name):
+		return
+	_current_animation_name = animation_name
+	_current_animation = _animations[animation_name] as WeaponAttackDefinition
+	_playback_time = _current_animation.get_duration(default_duration) if from_end else 0.0
+	_progress = 1.0 if from_end else 0.0
+	_playing = true
+	_event_marker_emitted = false
+	animation_started.emit(animation_name)
+	_update_pose_at_progress(_progress)
+
+func play_clip(animation: WeaponAttackDefinition) -> void:
+	add_animation_clip(animation)
+	play_pose(animation.attack_name)
+
+func stop_pose(keep_state: bool = false) -> void:
+	var finished_name: StringName = _current_animation_name
+	_playing = false
+	_current_animation = null
+	_current_animation_name = &""
+	_playback_time = 0.0
+	_progress = 0.0
+	_event_marker_emitted = false
+	if not keep_state:
+		_apply_idle_pose()
+	if not finished_name.is_empty():
+		animation_finished.emit(finished_name)
+
+func is_pose_playing() -> bool:
+	return _playing
+
+func get_current_animation_name() -> StringName:
+	return _current_animation_name
+
+func get_progress() -> float:
+	return _progress
 
 func set_draw_amount(amount: float) -> void:
-	is_drawing = amount > 0.0
-	draw_amount = amount
+	draw_amount = clamp(amount, 0.0, 1.0)
+	if not _playing:
+		_apply_idle_pose()
 
-func set_charge_amount(amount: float) -> void:
-	set_draw_amount(amount)
-
-func start_attack(attack_type: StringName = &"regular") -> void:
-	if is_multiplayer_authority() and multiplayer.has_multiplayer_peer():
-		_start_attack_raw.rpc(attack_type)
-	else:
-		_start_attack_raw(attack_type)
-
-@rpc("any_peer", "call_local", "reliable")
-func _start_attack_raw(attack_type: StringName) -> void:
-	is_attacking = true
-	attack_time = 0.0
-	current_attack_type = attack_type
-	strike_emitted = false
+func scrub(animation_name: StringName, progress: float) -> void:
+	if not _animations.has(animation_name):
+		return
+	_current_animation_name = animation_name
+	_current_animation = _animations[animation_name] as WeaponAttackDefinition
+	_progress = clamp(progress, 0.0, 1.0)
+	_manual_pose_active = true
+	_update_pose_at_progress(_progress)
 
 func _physics_process(delta: float) -> void:
-	_update_attack(delta)
+	if _playing:
+		_advance(delta)
+		return
+	if _manual_pose_active:
+		_manual_pose_active = false
+		return
+	_apply_idle_pose()
 
-func _update_attack(delta: float) -> void:
-	if is_attacking:
-		var attack := _get_current_attack()
-		if not attack:
-			is_attacking = false
-			_apply_pose(rest_pose)
-			return
-		
-		attack_time += delta
-		var duration := attack.get_duration(attack_duration)
-		var normalized_time := attack_time / duration
-		
-		if normalized_time >= 1.0:
-			normalized_time = 1.0
-			is_attacking = false
-			
-		var progress := normalized_time
-		var curve := attack.get_curve(attack_curve)
-		if curve:
-			progress = clamp(curve.sample(normalized_time), 0.0, 1.0)
-			
-		if not strike_emitted and progress >= attack.strike_event_time:
-			strike_emitted = true
-			strike_landed.emit()
-			attack_event_triggered.emit()
-			
-		_blend_attack_pose(progress, attack)
-	elif channel_attack != null:
-		_blend_attack_pose(channel_progress, channel_attack)
-	elif is_drawing:
+func _advance(delta: float) -> void:
+	if not _current_animation:
+		stop_pose()
+		return
+
+	var duration: float = _current_animation.get_duration(default_duration)
+	_playback_time += delta
+	var normalized_time: float = clamp(_playback_time / max(duration, 0.001), 0.0, 1.0)
+	var curve: Curve = _current_animation.get_curve(default_curve)
+	if curve:
+		_progress = clamp(curve.sample(normalized_time), 0.0, 1.0)
+	else:
+		_progress = normalized_time
+
+	if not _event_marker_emitted and _progress >= _current_animation.strike_event_time:
+		_event_marker_emitted = true
+		marker_reached.emit(&"event", _current_animation_name)
+
+	_update_pose_at_progress(_progress)
+
+	if normalized_time >= 1.0:
+		stop_pose(true)
+		_apply_idle_pose()
+
+func _apply_idle_pose() -> void:
+	if draw_amount > 0.0:
 		_blend_draw_pose(draw_amount)
 	else:
 		_apply_pose(rest_pose)
@@ -230,21 +171,47 @@ func _blend_draw_pose(amount: float) -> void:
 	target_node.position = target_pos
 	target_node.rotation = target_rot
 
-func _get_current_attack() -> WeaponAttackDefinition:
-	if not active_weapon:
-		return null
-	var attack := active_weapon.get_attack(current_attack_type)
-	if attack:
-		return attack
-	return active_weapon.get_default_attack()
+func _update_pose_at_progress(progress: float) -> void:
+	if not _current_animation or not target_node:
+		return
 
-func _get_resolved_pose_keys(attack: WeaponAttackDefinition) -> Array:
-	var key := String(attack.attack_name)
-	if resolved_attacks.has(key):
-		return resolved_attacks[key]
-	
+	var pose_keys := _get_resolved_pose_keys(_current_animation)
+	var from_pose: Dictionary = pose_keys[0]
+	var to_pose: Dictionary = pose_keys[pose_keys.size() - 1]
+
+	if progress <= from_pose.progress:
+		_apply_pose(_pose_with_enthusiasm(from_pose, _current_animation))
+		return
+
+	for i in range(pose_keys.size() - 1):
+		var a: Dictionary = pose_keys[i]
+		var b: Dictionary = pose_keys[i + 1]
+		if progress >= a.progress and progress <= b.progress:
+			from_pose = a
+			to_pose = b
+			break
+
+	if progress >= to_pose.progress:
+		_apply_pose(_pose_with_enthusiasm(to_pose, _current_animation))
+		return
+
+	var span: float = max(to_pose.progress - from_pose.progress, 0.0001)
+	var t: float = (progress - from_pose.progress) / span
+	var enthusiastic_from := _pose_with_enthusiasm(from_pose, _current_animation)
+	var enthusiastic_to := _pose_with_enthusiasm(to_pose, _current_animation)
+	var target_pos: Vector3 = enthusiastic_from.position.lerp(enthusiastic_to.position, t)
+	var target_rot: Vector3 = _lerp_rotation(enthusiastic_from.rotation, enthusiastic_to.rotation, t)
+
+	target_node.position = target_pos
+	target_node.rotation = target_rot
+
+func _get_resolved_pose_keys(animation: WeaponAttackDefinition) -> Array:
+	var key := String(animation.attack_name)
+	if _resolved_poses.has(key):
+		return _resolved_poses[key]
+
 	var resolved_keys: Array[Dictionary] = []
-	for pose_key in attack.pose_keys:
+	for pose_key in animation.pose_keys:
 		if not pose_key:
 			continue
 		var pose := {
@@ -253,7 +220,7 @@ func _get_resolved_pose_keys(attack: WeaponAttackDefinition) -> Array:
 			"rotation": pose_key.rotation
 		}
 		if pose_key.load_from_animation and not String(pose_key.animation_name).is_empty():
-			var loaded_pose := _load_pose_from_anim(
+			var loaded_pose := _load_pose_from_animation(
 				String(pose_key.animation_name),
 				pose_key.position,
 				pose_key.rotation
@@ -261,7 +228,7 @@ func _get_resolved_pose_keys(attack: WeaponAttackDefinition) -> Array:
 			pose.position = loaded_pose.position
 			pose.rotation = loaded_pose.rotation
 		resolved_keys.append(pose)
-	
+
 	if resolved_keys.is_empty():
 		resolved_keys.append({
 			"progress": 0.0,
@@ -273,55 +240,52 @@ func _get_resolved_pose_keys(attack: WeaponAttackDefinition) -> Array:
 			"position": rest_pose.position,
 			"rotation": rest_pose.rotation
 		})
-	
+
 	resolved_keys.sort_custom(_sort_pose_keys)
-	resolved_attacks[key] = resolved_keys
+	_resolved_poses[key] = resolved_keys
 	return resolved_keys
 
 func _sort_pose_keys(a: Dictionary, b: Dictionary) -> bool:
 	return a.progress < b.progress
 
-func _blend_attack_pose(progress: float, attack: WeaponAttackDefinition) -> void:
-	if not target_node:
-		return
-	
-	var pose_keys := _get_resolved_pose_keys(attack)
-	var from_pose: Dictionary = pose_keys[0]
-	var to_pose: Dictionary = pose_keys[pose_keys.size() - 1]
-	
-	if progress <= from_pose.progress:
-		_apply_pose(_pose_with_enthusiasm(from_pose, attack))
-		return
-	
-	for i in range(pose_keys.size() - 1):
-		var a: Dictionary = pose_keys[i]
-		var b: Dictionary = pose_keys[i + 1]
-		if progress >= a.progress and progress <= b.progress:
-			from_pose = a
-			to_pose = b
-			break
-	
-	if progress >= to_pose.progress:
-		_apply_pose(_pose_with_enthusiasm(to_pose, attack))
-		return
-	
-	var span: float = max(to_pose.progress - from_pose.progress, 0.0001)
-	var t = (progress - from_pose.progress) / span
-	var enthusiastic_from := _pose_with_enthusiasm(from_pose, attack)
-	var enthusiastic_to := _pose_with_enthusiasm(to_pose, attack)
-	var target_pos: Vector3 = enthusiastic_from.position.lerp(enthusiastic_to.position, t)
-	var target_rot: Vector3 = _lerp_rotation(enthusiastic_from.rotation, enthusiastic_to.rotation, t)
-	
-	target_node.position = target_pos
-	target_node.rotation = target_rot
-
-func _pose_with_enthusiasm(pose: Dictionary, attack: WeaponAttackDefinition) -> Dictionary:
-	var enthusiasm := attack.get_enthusiasm(attack_enthusiasm)
+func _pose_with_enthusiasm(pose: Dictionary, animation: WeaponAttackDefinition) -> Dictionary:
+	var enthusiasm := animation.get_enthusiasm(default_enthusiasm)
 	return {
 		"progress": pose.get("progress", 0.0),
 		"position": rest_pose.position + (pose.position - rest_pose.position) * enthusiasm,
 		"rotation": rest_pose.rotation + (pose.rotation - rest_pose.rotation) * enthusiasm
 	}
+
+func _load_pose_from_animation(
+	animation_name: String,
+	fallback_position: Vector3 = Vector3(0.6, 1.3, -0.8),
+	fallback_rotation: Vector3 = Vector3.ZERO
+) -> Dictionary:
+	var pose := {
+		"position": fallback_position,
+		"rotation": fallback_rotation
+	}
+
+	if animation_name.is_empty() or not has_animation(animation_name) or not target_node:
+		return pose
+
+	var animation: Animation = get_animation(animation_name)
+	var root: Node = get_node_or_null(animation_root_path)
+	if not root:
+		return pose
+
+	var relative_path: NodePath = root.get_path_to(target_node)
+	var pos_track_path: String = str(relative_path) + ":position"
+	var rot_track_path: String = str(relative_path) + ":rotation"
+	var pos_track: int = animation.find_track(pos_track_path, Animation.TYPE_VALUE)
+	var rot_track: int = animation.find_track(rot_track_path, Animation.TYPE_VALUE)
+
+	if pos_track != -1 and animation.track_get_key_count(pos_track) > 0:
+		pose.position = animation.track_get_key_value(pos_track, 0)
+	if rot_track != -1 and animation.track_get_key_count(rot_track) > 0:
+		pose.rotation = animation.track_get_key_value(rot_track, 0)
+
+	return pose
 
 func _apply_pose(pose: Dictionary) -> void:
 	if not target_node:
@@ -331,16 +295,3 @@ func _apply_pose(pose: Dictionary) -> void:
 
 func _lerp_rotation(rot_a: Vector3, rot_b: Vector3, t: float) -> Vector3:
 	return rot_a.lerp(rot_b, t)
-
-func is_strike_active() -> bool:
-	if not is_attacking:
-		return false
-	var attack := _get_current_attack()
-	if not attack:
-		return false
-	var normalized_time := attack_time / attack.get_duration(attack_duration)
-	var progress := normalized_time
-	var curve := attack.get_curve(attack_curve)
-	if curve:
-		progress = clamp(curve.sample(normalized_time), 0.0, 1.0)
-	return progress >= attack.strike_start and progress < attack.strike_end

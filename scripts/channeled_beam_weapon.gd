@@ -1,8 +1,7 @@
 extends Weapon
 class_name ChanneledBeamWeapon
 
-## Concrete implementation/template for Channeled Beam Weapons (e.g., Staff with laser).
-## Emits a continuous laser beam/cone and does damage over time while holding attack.
+## Weapon that applies repeated damage while the primary action is held.
 
 @export_group("Damage Settings")
 @export var damage_per_second: float = 40.0
@@ -31,22 +30,18 @@ func _ready() -> void:
 		channeled_hurtbox.monitoring = false
 		channeled_hurtbox.monitorable = false
 
-func setup(owner_body: CharacterBody3D, blender: PoseBlendComponent) -> void:
-	owner_character = owner_body
-	pose_blender = blender
-	if pose_blender:
-		if not definition:
-			definition = WeaponDefinition.new()
-		pose_blender.set_weapon(definition)
+func _setup_weapon() -> void:
+	if not definition:
+		definition = WeaponDefinition.new()
 
-func primary_pressed() -> void:
+func _press_primary() -> void:
 	is_channeling = true
 	_tick_timer = 0.0
 
-func primary_released() -> void:
+func _release_primary() -> void:
 	_stop_channeling()
 
-func cancel() -> void:
+func _cancel() -> void:
 	_stop_channeling()
 
 func _stop_channeling() -> void:
@@ -54,35 +49,31 @@ func _stop_channeling() -> void:
 		return
 	is_channeling = false
 
-func update_weapon(delta: float, _aim_camera: Camera3D) -> void:
-	# Fetch attack from definition to get its duration and strike_event_time
+func _tick(delta: float) -> void:
 	var attack: WeaponAttackDefinition = null
 	if definition:
 		attack = definition.get_attack(channel_attack_name)
 		if not attack:
 			attack = definition.get_default_attack()
 			
-	var duration = 0.25 # Default fallback if no duration is found
-	var strike_time = 0.0 # Default fallback (start immediately)
+	var duration := 0.25
+	var strike_time := 0.0
 	if attack:
 		if attack.duration > 0.0:
 			duration = attack.duration
 		strike_time = attack.strike_event_time
 
-	# Update draw_amount based on attack duration
 	if is_channeling:
 		draw_amount = min(draw_amount + delta / duration, 1.0)
 	else:
 		draw_amount = move_toward(draw_amount, 0.0, delta / duration)
 		
-	# Synchronize pose using the configured channel attack definition
 	if pose_blender:
 		if attack and (is_channeling or draw_amount > 0.0):
-			pose_blender.set_channel_state(attack, draw_amount)
+			pose_blender.scrub(attack.attack_name, draw_amount)
 		else:
-			pose_blender.set_channel_state(null, 0.0)
+			pose_blender.stop_pose()
 			
-	# Enable hurtbox only when channeling and animation progress has reached strike_event_time
 	var should_monitor = is_channeling and draw_amount >= strike_time
 	if channeled_hurtbox and channeled_hurtbox.monitoring != should_monitor:
 		channeled_hurtbox.monitoring = should_monitor
@@ -93,7 +84,6 @@ func update_weapon(delta: float, _aim_camera: Camera3D) -> void:
 	if not is_channeling:
 		return
 		
-	# Handle tick damage from the overlapping targets in the hurtbox
 	_tick_timer += delta
 	if _tick_timer >= damage_tick_rate:
 		_tick_timer -= damage_tick_rate
@@ -108,41 +98,19 @@ func update_weapon(delta: float, _aim_camera: Camera3D) -> void:
 					
 			var tick_damage = damage_per_second * damage_tick_rate
 			for target_node in targets:
-				var actual_target = target_node
-				if actual_target and not actual_target.has_method("take_damage"):
-					if actual_target.has_node("Hitbox"):
-						actual_target = actual_target.get_node("Hitbox")
-					elif actual_target.has_node("Hittable"):
-						actual_target = actual_target.get_node("Hittable")
-					elif "hittable" in actual_target and actual_target.hittable:
-						actual_target = actual_target.hittable
-						
-				if actual_target and actual_target.has_method("take_damage"):
-					var hit_pos = actual_target.global_position
+				var actual_target := DamageResolver.resolve_hittable(target_node)
+				if actual_target:
+					var hit_pos := actual_target.global_position
 					var hit_normal = Vector3.UP
 					_damage_target(actual_target, tick_damage, hit_pos, hit_normal)
 					
-	# Update visual beam position if muzzle is available
 	if _muzzle and beam_visual:
 		var direction = -_muzzle.global_transform.basis.z.normalized()
 		var end_point = _muzzle.global_position + direction * beam_range
 		_update_beam_visual(end_point)
 
-func _damage_target(target: Node, dmg: float, hit_pos: Vector3, hit_normal: Vector3) -> void:
-	var is_rpc = false
-	if target.has_method("get_rpc_config"):
-		is_rpc = target.get_rpc_config().has(&"take_damage")
-		
-	if target is Area3D:
-		if is_rpc:
-			target.take_damage.rpc(int(dmg), self, hit_pos, hit_normal)
-		else:
-			target.take_damage(int(dmg), self, hit_pos, hit_normal)
-	else:
-		if is_rpc:
-			target.take_damage.rpc(dmg, hit_pos, hit_normal)
-		else:
-			target.take_damage(dmg, hit_pos, hit_normal)
+func _damage_target(target: Hittable, dmg: float, hit_pos: Vector3, hit_normal: Vector3) -> void:
+	DamageResolver.emit_hit(target, int(dmg), self, hit_pos, hit_normal)
 
 func _update_beam_visual(target_position: Vector3) -> void:
 	if not beam_visual:
@@ -150,14 +118,11 @@ func _update_beam_visual(target_position: Vector3) -> void:
 		
 	var start_position = _muzzle.global_position if _muzzle else global_position
 	
-	# Position beam halfway between start and target
 	beam_visual.global_position = start_position.lerp(target_position, 0.5)
 	
-	# Orient beam to look at the target position
 	var diff = target_position - start_position
 	if diff.length_squared() > 0.001:
 		beam_visual.look_at(target_position, Vector3.UP)
 		
-		# Scale visual length along Z to match the distance
 		var distance = diff.length()
 		beam_visual.scale.z = distance

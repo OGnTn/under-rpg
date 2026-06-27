@@ -9,13 +9,25 @@ class_name ArrowProjectile
 var velocity: Vector3 = Vector3.ZERO
 var damage: float = 10.0
 var shooter: Node
+var damage_source: Node3D
 var lifetime: float = 5.0
 var _stuck: bool = false
 
-func launch(direction: Vector3, speed: float, shot_damage: float, shot_owner: Node, shot_lifetime: float = 5.0) -> void:
+func launch(
+	direction: Vector3,
+	speed: float,
+	shot_damage: float,
+	shot_owner: Node,
+	shot_lifetime: float = 5.0,
+	shot_damage_source: Node3D = null
+) -> void:
 	velocity = direction.normalized() * speed
 	damage = shot_damage
 	shooter = shot_owner
+	if shot_damage_source:
+		damage_source = shot_damage_source
+	else:
+		damage_source = shot_owner as Node3D
 	lifetime = shot_lifetime
 	_face_velocity()
 
@@ -64,32 +76,14 @@ func _is_valid_hit(collider: Node) -> bool:
 		# Physics bodies (e.g. solid walls, floors) are always valid hits.
 		return true
 		
-	# Area3D is only a valid hit if it resolves to a node that has a take_damage method.
-	var target_node = collider
-	if not target_node.has_method("take_damage"):
-		if target_node.has_node("Hitbox"):
-			target_node = target_node.get_node("Hitbox")
-		elif target_node.has_node("Hittable"):
-			target_node = target_node.get_node("Hittable")
-		elif "hittable" in target_node and target_node.hittable:
-			target_node = target_node.hittable
-			
-	return target_node != null and target_node.has_method("take_damage")
+	return DamageResolver.is_hittable(collider)
 
 func _on_hit(hit: Dictionary) -> void:
 	global_position = hit.position
 	var collider: Object = hit.collider
 	
-	var target_node = collider
-	if target_node and not target_node.has_method("take_damage"):
-		if target_node.has_node("Hitbox"):
-			target_node = target_node.get_node("Hitbox")
-		elif target_node.has_node("Hittable"):
-			target_node = target_node.get_node("Hittable")
-		elif "hittable" in target_node and target_node.hittable:
-			target_node = target_node.hittable
-			
-	if shooter and shooter.is_multiplayer_authority() and target_node and target_node.has_method("take_damage"):
+	var target_node := DamageResolver.resolve_hittable(collider as Node)
+	if shooter and shooter.is_multiplayer_authority() and target_node:
 		var normal: Vector3 = hit.normal if hit.has("normal") else -velocity.normalized()
 		_damage_target(target_node, damage, hit.position, normal)
 	
@@ -99,32 +93,8 @@ func _on_hit(hit: Dictionary) -> void:
 	else:
 		queue_free()
 
-func _damage_target(target: Node, dmg: float, hit_pos: Vector3, hit_normal: Vector3) -> void:
-	if target and not target.has_method("take_damage"):
-		if target.has_node("Hitbox"):
-			target = target.get_node("Hitbox")
-		elif target.has_node("Hittable"):
-			target = target.get_node("Hittable")
-		elif "hittable" in target and target.hittable:
-			target = target.hittable
-			
-	if not target or not target.has_method("take_damage"):
-		return
-	
-	var is_rpc = false
-	if target.has_method("get_rpc_config"):
-		is_rpc = target.get_rpc_config().has(&"take_damage")
-		
-	if target is Area3D:
-		if is_rpc:
-			target.take_damage.rpc(int(dmg), shooter, hit_pos, hit_normal)
-		else:
-			target.take_damage(int(dmg), shooter, hit_pos, hit_normal)
-	else:
-		if is_rpc:
-			target.take_damage.rpc(dmg, hit_pos, hit_normal)
-		else:
-			target.take_damage(dmg, hit_pos, hit_normal)
+func _damage_target(target: Hittable, dmg: float, hit_pos: Vector3, hit_normal: Vector3) -> void:
+	DamageResolver.emit_hit(target, int(dmg), damage_source, hit_pos, hit_normal)
 
 func _face_velocity() -> void:
 	if velocity.length_squared() < 0.0001:

@@ -8,13 +8,30 @@ signal mana_changed(old_value: int, new_value: int)
 signal stamina_changed(old_value: int, new_value: int)
 
 @export var max_health: int = 100
-@export var current_health: int = 100
+@export var current_health: int = 100:
+	set(value):
+		var old_value := current_health
+		current_health = int(clamp(value, 0, max_health))
+		if old_value != current_health:
+			health_changed.emit(old_value, current_health)
+		if old_value > 0 and current_health <= 0:
+			health_depleted.emit()
 
 @export var max_mana: int = 100
-@export var current_mana: int = 100
+@export var current_mana: int = 100:
+	set(value):
+		var old_value := current_mana
+		current_mana = int(clamp(value, 0, max_mana))
+		if old_value != current_mana:
+			mana_changed.emit(old_value, current_mana)
 
 @export var max_stamina: int = 100
-@export var current_stamina: int = 100
+@export var current_stamina: int = 100:
+	set(value):
+		var old_value := current_stamina
+		current_stamina = int(clamp(value, 0, max_stamina))
+		if old_value != current_stamina:
+			stamina_changed.emit(old_value, current_stamina)
 
 @export var destroy_parent_on_depletion: bool = false
 
@@ -58,7 +75,8 @@ func _ready():
 		call_deferred("_setup_health_bar")
 
 func _process(delta: float) -> void:
-	_apply_regeneration(delta)
+	if _can_mutate_resources():
+		_apply_regeneration(delta)
 
 func _on_stats_changed() -> void:
 	if not stats_component:
@@ -74,77 +92,63 @@ func _on_stats_changed() -> void:
 	
 	# Clamp pools to new maxes if needed
 	if current_health > max_health:
-		var old = current_health
 		current_health = max_health
-		health_changed.emit(old, current_health)
 		
 	if current_mana > max_mana:
-		var old = current_mana
 		current_mana = max_mana
-		mana_changed.emit(old, current_mana)
 		
 	if current_stamina > max_stamina:
-		var old = current_stamina
 		current_stamina = max_stamina
-		stamina_changed.emit(old, current_stamina)
 
 func _on_hittable_hit(damage: int, damage_source: Node3D, _pos: Vector3, _normal: Vector3):
-	if multiplayer.is_server():
-		# Check tool compatibility if present
-		var tool_compat = get_parent().find_child("ToolCompatibilityComponent", true, false)
-		if tool_compat and not tool_compat.is_compatible(damage_source):
-			return
-		
-		take_damage(damage)
+	if not _can_mutate_resources():
+		return
+
+	var tool_compat = get_parent().find_child("ToolCompatibilityComponent", true, false)
+	if tool_compat and not tool_compat.is_compatible(damage_source):
+		return
+
+	take_damage(damage)
 
 func take_damage(amount: int):
+	if not _can_mutate_resources():
+		return
 	if current_health <= 0:
 		return
-	var old_health = current_health
 	current_health = max(0, current_health - amount)
-	health_changed.emit(old_health, current_health)
 	
 	if current_health <= 0:
-		health_depleted.emit()
 		if destroy_parent_on_depletion:
 			get_parent().queue_free()
 
 func heal(amount: int):
+	if not _can_mutate_resources():
+		return
 	if current_health <= 0 or amount <= 0:
 		return
-	var old_health = current_health
 	current_health = min(max_health, current_health + amount)
-	health_changed.emit(old_health, current_health)
 
 func use_mana(amount: int) -> bool:
 	if current_mana < amount:
 		return false
-	var old_mana = current_mana
 	current_mana -= amount
-	mana_changed.emit(old_mana, current_mana)
 	return true
 
 func restore_mana(amount: int):
 	if amount <= 0:
 		return
-	var old_mana = current_mana
 	current_mana = min(max_mana, current_mana + amount)
-	mana_changed.emit(old_mana, current_mana)
 
 func use_stamina(amount: int) -> bool:
 	if current_stamina < amount:
 		return false
-	var old_stamina = current_stamina
 	current_stamina -= amount
-	stamina_changed.emit(old_stamina, current_stamina)
 	return true
 
 func restore_stamina(amount: int):
 	if amount <= 0:
 		return
-	var old_stamina = current_stamina
 	current_stamina = min(max_stamina, current_stamina + amount)
-	stamina_changed.emit(old_stamina, current_stamina)
 
 func _apply_regeneration(delta: float) -> void:
 	# Only regenerate if the entity is alive
@@ -183,6 +187,9 @@ func _apply_regeneration(delta: float) -> void:
 			var amount = int(_stamina_accum)
 			_stamina_accum -= amount
 			restore_stamina(amount)
+
+func _can_mutate_resources() -> bool:
+	return not multiplayer.has_multiplayer_peer() or multiplayer.is_server()
 
 func _setup_health_bar() -> void:
 	if not get_parent():

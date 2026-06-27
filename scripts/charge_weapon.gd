@@ -1,8 +1,7 @@
 extends Weapon
 class_name ChargeWeapon
 
-## Concrete implementation for Charged Projectile Weapons (e.g., Bow).
-## Handles draw time on hold, released firing, and custom speed/damage.
+## Weapon that charges while held, then fires a projectile on release.
 
 @export_group("Draw Settings")
 @export var draw_time: float = 1.0
@@ -35,13 +34,9 @@ func _ready() -> void:
 	if not muzzle_path.is_empty():
 		_muzzle = get_node_or_null(muzzle_path) as Node3D
 
-func setup(owner_body: CharacterBody3D, blender: PoseBlendComponent) -> void:
-	owner_character = owner_body
-	pose_blender = blender
-	if pose_blender:
-		if not definition:
-			definition = _create_fallback_definition()
-		pose_blender.set_weapon(definition)
+func _setup_weapon() -> void:
+	if not definition:
+		definition = _create_fallback_definition()
 
 func _create_fallback_definition() -> WeaponDefinition:
 	var weapon := WeaponDefinition.new()
@@ -78,11 +73,11 @@ func _create_fallback_definition() -> WeaponDefinition:
 	weapon.attacks = [attack]
 	return weapon
 
-func primary_pressed() -> void:
+func _press_primary() -> void:
 	is_drawing = true
 	_draw_elapsed = 0.0
 
-func primary_released() -> void:
+func _release_primary() -> void:
 	if not is_drawing:
 		return
 		
@@ -91,17 +86,15 @@ func primary_released() -> void:
 	_draw_elapsed = 0.0
 	
 	if is_multiplayer_authority():
-		var aim_source: Node3D = null
-		if owner_character:
-			if owner_character.has_node("ViewModel/Camera3D"):
-				aim_source = owner_character.get_node("ViewModel/Camera3D")
-			else:
-				aim_source = owner_character.get_viewport().get_camera_3d()
+		var aim_source := get_aim_source()
 		
 		if aim_source:
 			var launch_transform := _get_launch_transform(aim_source)
 			var direction := -aim_source.global_transform.basis.z
-			_fire_projectile_rpc.rpc(launch_transform, direction, shot_power)
+			if multiplayer.has_multiplayer_peer():
+				_fire_projectile_rpc.rpc(launch_transform, direction, shot_power)
+			else:
+				_fire_projectile_rpc(launch_transform, direction, shot_power)
 
 @rpc("any_peer", "call_local", "reliable")
 func _fire_projectile_rpc(launch_transform: Transform3D, direction: Vector3, shot_power: float) -> void:
@@ -119,21 +112,21 @@ func _fire_projectile_rpc(launch_transform: Transform3D, direction: Vector3, sho
 	var speed = lerp(min_projectile_speed, max_projectile_speed, shot_power)
 	var damage = lerp(min_damage, max_damage, shot_power)
 	if proj.has_method("launch"):
-		proj.launch(direction, speed, damage, owner_character, projectile_lifetime)
+		proj.launch(direction, speed, damage, owner_character, projectile_lifetime, self)
 		
 	weapon_fired.emit()
 	
 	if pose_blender:
-		pose_blender.set_charge_amount(0.0)
-		pose_blender.start_attack(&"shoot")
+		pose_blender.set_draw_amount(0.0)
+		pose_blender.play_pose(&"shoot")
 
-func cancel() -> void:
+func _cancel() -> void:
 	is_drawing = false
 	_draw_elapsed = 0.0
 	if pose_blender:
-		pose_blender.set_charge_amount(0.0)
+		pose_blender.set_draw_amount(0.0)
 
-func update_weapon(delta: float, _aim_camera: Camera3D) -> void:
+func _tick(delta: float) -> void:
 	if is_drawing:
 		var safe_draw_time = max(draw_time, 0.001)
 		_draw_elapsed = min(_draw_elapsed + delta, safe_draw_time)
@@ -144,7 +137,7 @@ func update_weapon(delta: float, _aim_camera: Camera3D) -> void:
 	_apply_draw_amount()
 	
 	if pose_blender:
-		pose_blender.set_charge_amount(draw_amount)
+		pose_blender.set_draw_amount(draw_amount)
 
 func _apply_draw_amount() -> void:
 	if _visuals and not blend_shape_name.is_empty():

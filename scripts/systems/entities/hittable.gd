@@ -62,7 +62,18 @@ func _find_first_mesh(node: Node) -> MeshInstance3D:
 	return null
 
 @rpc("any_peer", "reliable", "call_local")
-func take_damage(damage: int, damage_source: Node3D = null, hit_position: Vector3 = Vector3.ZERO, hit_normal: Vector3 = Vector3.ZERO) -> void:
+func receive_hit_rpc(
+	damage: int,
+	damage_source_path: NodePath = NodePath(),
+	hit_position: Vector3 = Vector3.ZERO,
+	hit_normal: Vector3 = Vector3.ZERO
+) -> void:
+	var damage_source: Node3D = null
+	if not String(damage_source_path).is_empty():
+		damage_source = get_node_or_null(damage_source_path) as Node3D
+	receive_hit(damage, damage_source, hit_position, hit_normal)
+
+func receive_hit(damage: int, damage_source: Node3D = null, hit_position: Vector3 = Vector3.ZERO, hit_normal: Vector3 = Vector3.ZERO) -> void:
 	flash_effect()
 	
 	if not _orig_mesh_scale_initialized:
@@ -97,6 +108,9 @@ func take_damage(damage: int, damage_source: Node3D = null, hit_position: Vector
 				proj_particles.look_at(target_dir, Vector3.UP)
 				
 	hit.emit(damage, damage_source, hit_position, hit_normal)
+
+func take_damage(damage: int, damage_source: Node3D = null, hit_position: Vector3 = Vector3.ZERO, hit_normal: Vector3 = Vector3.ZERO) -> void:
+	receive_hit(damage, damage_source, hit_position, hit_normal)
 
 func flash_effect() -> void:
 	if not mesh_instance or not flash_material: return

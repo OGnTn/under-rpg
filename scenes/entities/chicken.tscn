@@ -180,6 +180,9 @@ properties/2/replication_mode = 2
 properties/3/path = NodePath(".:is_dead")
 properties/3/spawn = true
 properties/3/replication_mode = 2
+properties/4/path = NodePath("ResourceComponent:current_health")
+properties/4/spawn = true
+properties/4/replication_mode = 2
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_1lyua"]
 viewport_path = NodePath("ResourceBar3D/SubViewport")
@@ -305,8 +308,8 @@ anim_tree = NodePath("../AnimationTree")
 [node name="chicken" parent="." unique_id=1557359479 instance=ExtResource("10_y3o3b")]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 
-[node name="Skeleton3D" parent="chicken/Chicken" parent_id_path=PackedInt32Array(1557359479, 329982925) index="0" unique_id=1128821035]
-bones/0/rotation = Quaternion(0.21468118, 0.7343322, 0.26640373, 0.58625704)
+[node name="Skeleton3D" parent="chicken/Chicken" parent_id_path=PackedInt32Array(1557359479, 378797079) index="0" unique_id=1190331166]
+bones/0/rotation = Quaternion(0.34845608, 0.75354946, 0.20564803, 0.51812214)
 bones/2/rotation = Quaternion(0.011089176, 0.99992996, 0.0019561897, 0.0036440815)
 bones/3/position = Vector3(-0.003404573, 0.003995829, 0.000995463)
 bones/3/rotation = Quaternion(-0.045691457, 0.49707335, 0.86149985, 0.09299666)
@@ -321,14 +324,14 @@ bones/7/position = Vector3(0.0033451635, 0.0038461967, 0.00094596716)
 bones/7/rotation = Quaternion(0.06301109, 0.49524358, 0.8629913, -0.0775223)
 bones/7/scale = Vector3(0.9999998, 1, 0.9999999)
 bones/8/position = Vector3(-5.758114e-10, 0.007497862, 5.7732447e-10)
-bones/8/rotation = Quaternion(0.5617751, 0.05206564, -0.20612463, 0.7995065)
+bones/8/rotation = Quaternion(0.55026126, -0.019389516, -0.13749069, 0.8233669)
 bones/8/scale = Vector3(1.0000001, 1.0000001, 1.0000001)
 bones/9/position = Vector3(1.9226974e-10, 0.0044775708, -1.1329441e-09)
 bones/9/rotation = Quaternion(0.43352666, -0.5598119, -0.16864644, 0.68572855)
 bones/9/scale = Vector3(1.0000001, 1.0000001, 0.99999976)
 bones/11/rotation = Quaternion(0.31352967, 0.6670831, 0.3697291, 0.56568515)
 bones/13/rotation = Quaternion(0.3084632, 0.67167866, 0.36670378, 0.56500137)
-bones/15/rotation = Quaternion(0.38658863, 0.27786127, 0.87420064, -0.09547647)
+bones/15/rotation = Quaternion(0.48748636, 0.15737219, 0.82953155, 0.22241539)
 
 [node name="ResourceBar3D" type="Sprite3D" parent="." unique_id=85150369]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5274227, 0)

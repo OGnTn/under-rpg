@@ -1,71 +1,70 @@
-# interacter.gd
 extends RayCast3D
+class_name PlayerInteractor
 
-var highlighted_obj: Interactable = null
-#@onready var world_node: World = null
-
-@export
-var manipulating = false
-
-func _ready() -> void:
-	# Attempt to find the world node dynamically
-	# Adjust this path if your scene structure is different
-	#world_node = get_tree().current_scene.find_child("World", true, false)
-	
-	# Exclude the player from the raycast so we don't hit our own back in 3rd person
-	var p = get_parent()
-	while p and not p is CharacterBody3D:
-		p = p.get_parent()
-	if p:
-		player = p
-		add_exception(player)
+@export var interact_distance: float = 5.0
 
 @onready var interact_prompt: Control = %InteractPrompt
 @onready var crosshair: Control = %Crosshair
-var player: CharacterBody3D = null
+@onready var prompt_label: Label = interact_prompt.get_node_or_null("HBoxContainer/Label") as Label
 
+var player: Player
+var target: Interactable
 
-func _physics_process(_delta: float) -> void:
-	# Only process for the local player
-	if not is_multiplayer_authority():
+func _ready() -> void:
+	player = _find_player()
+	if player:
+		add_exception(player)
+	_update_prompt(null)
+
+func get_target() -> Interactable:
+	return target
+
+func clear_target() -> void:
+	target = null
+	_update_prompt(null)
+
+func interact() -> void:
+	if not target:
 		return
-
-	if player and "is_third_person" in player:
-		var base_dist = 5.0
-		if player.is_third_person:
-			target_position.z = -(base_dist + player.third_person_distance)
-		else:
-			target_position.z = -base_dist
-
-	if is_colliding():
-		var obj = get_collider()
-		if obj is Interactable and obj.is_enabled:
-			highlighted_obj = obj
-			interact_prompt.visible = true
-			crosshair.visible = false
-			var label = interact_prompt.get_node_or_null("HBoxContainer/Label")
-			if label:
-				label.text = obj.prompt_message
-		else:
-			# If looking at terrain, clear interact prompt but keep crosshair
-			highlighted_obj = null
-			interact_prompt.visible = false
-			crosshair.visible = true
-	else:
-		highlighted_obj = null
-		interact_prompt.visible = false
-		crosshair.visible = true
-	
+	target.interact.rpc(multiplayer.get_unique_id())
 
 func _input(event: InputEvent) -> void:
-	# Only process input for the local player
+	if is_multiplayer_authority() and event.is_action_pressed("interact"):
+		interact()
+
+func _physics_process(_delta: float) -> void:
 	if not is_multiplayer_authority():
 		return
 
-	if event.is_action_pressed("interact"):
-		interact()
-		return
+	_update_distance()
+	var next_target := _get_hovered_interactable()
+	if target != next_target:
+		target = next_target
+		_update_prompt(target)
 
-func interact():
-	if (highlighted_obj != null):
-		highlighted_obj.interact.rpc(multiplayer.get_unique_id())
+func _find_player() -> Player:
+	var node := get_parent()
+	while node and not node is Player:
+		node = node.get_parent()
+	return node as Player
+
+func _update_distance() -> void:
+	var distance := interact_distance
+	if player and player.is_third_person:
+		distance += player.third_person_distance
+	target_position = Vector3(0.0, 0.0, -distance)
+
+func _get_hovered_interactable() -> Interactable:
+	if not is_colliding():
+		return null
+	var collider := get_collider()
+	if collider is Interactable and collider.is_enabled:
+		return collider
+	return null
+
+func _update_prompt(interactable: Interactable) -> void:
+	var has_target := interactable != null
+	interact_prompt.visible = has_target
+	crosshair.visible = not has_target
+	if has_target and prompt_label:
+		prompt_label.text = interactable.prompt_message

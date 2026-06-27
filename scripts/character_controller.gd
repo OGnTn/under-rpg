@@ -1,162 +1,157 @@
 extends CharacterBody3D
 class_name Player
 
-## FPS Movement, Looking, and Perspective Controller
-## Implements basic movement, looking, mouse capture, and perspective switching.
-
-# Movement Settings
 @export_group("Movement")
 @export var speed: float = 5.0
 @export var acceleration: float = 15.0
 @export var jump_velocity: float = 4.5
 @export var mouse_sensitivity: float = 0.002
 
-# Node References
-@onready var camera: Camera3D = %Camera3D
-@onready var spring_arm: SpringArm3D = %SpringArm3D
-@onready var arm_container: Node3D = %ViewModel.get_node("ArmContainer")
-@onready var animation_tree: AnimationTree = %AnimationTree
-
-var inventory: Inventory:
-	get:
-		return get_node_or_null("Inventory")
-
-## First/third person toggle
 @export_group("Perspective")
 @export var is_third_person: bool = false:
-	set(val):
-		if is_third_person != val:
-			is_third_person = val
-			_apply_perspective()
+	set(value):
+		if is_third_person == value:
+			return
+		is_third_person = value
+		_apply_perspective()
 @export var third_person_distance: float = 3.0
 @export var shoulder_offset: Vector3 = Vector3(0.4, 0.0, 0.0)
+@export var eye_position: Vector3 = Vector3(0.0, 1.8476624, 0.10041666)
+@export var max_pitch_degrees: float = 85.0
 
-# Physics & Tracking
+@onready var camera: Camera3D = %Camera3D
+@onready var spring_arm: SpringArm3D = %SpringArm3D
+@onready var view_model: Node3D = %ViewModel
+@onready var arm_container: Node3D = %ViewModel.get_node("ArmContainer")
+@onready var character_model: Node3D = %character_model
+@onready var ui_canvas: CanvasLayer = %UICanvas
+
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var body_global_yaw: float = 0.0
 var body_yaw_initialized: bool = false
 
+var inventory: Inventory:
+	get:
+		return get_node_or_null("Inventory") as Inventory
+
 func _enter_tree() -> void:
-	# Authority must be set here (not _ready) because _enter_tree fires
-	# top-down (parent → children), while _ready fires bottom-up.
 	if name.is_valid_int():
 		set_multiplayer_authority(name.to_int(), true)
 
 func _ready() -> void:
-	if not is_multiplayer_authority():
-		camera.current = false
-		if has_node("CanvasLayer"):
-			%UICanvas.visible = false
-		set_process_input(false)
-		set_process_unhandled_input(false)
-		%character_model.visible = true
-		arm_container.visible = true
-		return
-		
-	camera.current = true
-	# Capture the mouse by default
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	
-	# Apply initial perspective state
+	_configure_local_player(is_multiplayer_authority())
 	_apply_perspective()
+
+func capture_mouse() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func release_mouse() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func toggle_mouse_capture() -> void:
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		release_mouse()
+	else:
+		capture_mouse()
+
+func set_perspective(third_person: bool) -> void:
+	is_third_person = third_person
+
+func toggle_perspective() -> void:
+	set_perspective(not is_third_person)
+
+func get_aim_camera() -> Camera3D:
+	return camera
 
 func _input(event: InputEvent) -> void:
 	if not is_multiplayer_authority():
 		return
-		
-	# Handle mouse looking
+
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		# Rotate character body horizontally (yaw)
-		rotate_y(-event.relative.x * mouse_sensitivity)
-		
-		# Rotate vertically (pitch) — spring arm handles it for both perspectives if present
-		if spring_arm:
-			spring_arm.rotate_x(-event.relative.y * mouse_sensitivity)
-			spring_arm.rotation.x = clamp(spring_arm.rotation.x, -deg_to_rad(85), deg_to_rad(85))
-		else:
-			camera.rotate_x(-event.relative.y * mouse_sensitivity)
-			camera.rotation.x = clamp(camera.rotation.x, -deg_to_rad(85), deg_to_rad(85))
-	
-	# Toggle mouse capture
+		_apply_look(event.relative)
+
 	if event.is_action_pressed("ui_cancel"):
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		else:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		toggle_mouse_capture()
 
-	# Toggle first/third person perspective
 	if event.is_action_pressed("toggle_perspective"):
-		_toggle_perspective()
-
+		toggle_perspective()
 
 func _physics_process(delta: float) -> void:
 	if is_multiplayer_authority():
-		# Apply gravity
-		if not is_on_floor():
-			velocity.y -= gravity * delta
-	
-		# Handle jump
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			velocity.y = jump_velocity
-	
-		# Get input direction
-		var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
-		var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-		
-		# Apply movement with smooth acceleration/deceleration
-		if direction:
-			velocity.x = lerp(velocity.x, direction.x * speed, acceleration * delta)
-			velocity.z = lerp(velocity.z, direction.z * speed, acceleration * delta)
-		else:
-			velocity.x = lerp(velocity.x, 0.0, acceleration * delta)
-			velocity.z = lerp(velocity.z, 0.0, acceleration * delta)
-	
+		_apply_gravity(delta)
+		_apply_jump()
+		_apply_movement(delta)
 		move_and_slide()
-	
-	# Smoothly turn body in place or when moving
-	var model = get_node_or_null("ViewModel/character_model")
-	if model:
-		if not body_yaw_initialized:
-			body_global_yaw = global_rotation.y + PI
-			body_yaw_initialized = true
-			
-		var parent_global_yaw = global_rotation.y
-		var angle_diff = wrapf(parent_global_yaw - (body_global_yaw - PI), -PI, PI)
-		angle_diff = clamp(angle_diff, -deg_to_rad(75.0), deg_to_rad(75.0))
-		body_global_yaw = parent_global_yaw + PI - angle_diff
-		
-		var is_moving = velocity.length() > 0.1
-		var turn_speed = 10.0 if is_moving else 4.0
-		body_global_yaw = lerp_angle(body_global_yaw, parent_global_yaw + PI, turn_speed * delta)
-		model.rotation.y = body_global_yaw - parent_global_yaw
 
-func _toggle_perspective() -> void:
-	is_third_person = !is_third_person
+	_update_character_yaw(delta)
+
+func _configure_local_player(is_local: bool) -> void:
+	camera.current = is_local
+	ui_canvas.visible = is_local
+	set_process_input(is_local)
+	set_process_unhandled_input(is_local)
+
+	if is_local:
+		capture_mouse()
+	else:
+		character_model.visible = true
+		arm_container.visible = true
+
+func _apply_look(mouse_delta: Vector2) -> void:
+	rotate_y(-mouse_delta.x * mouse_sensitivity)
+
+	var pitch_delta := -mouse_delta.y * mouse_sensitivity
+	if spring_arm:
+		spring_arm.rotate_x(pitch_delta)
+		spring_arm.rotation.x = clamp(spring_arm.rotation.x, -deg_to_rad(max_pitch_degrees), deg_to_rad(max_pitch_degrees))
+	else:
+		camera.rotate_x(pitch_delta)
+		camera.rotation.x = clamp(camera.rotation.x, -deg_to_rad(max_pitch_degrees), deg_to_rad(max_pitch_degrees))
+
+func _apply_gravity(delta: float) -> void:
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+
+func _apply_jump() -> void:
+	if Input.is_action_just_pressed("jump") and is_on_floor():
+		velocity.y = jump_velocity
+
+func _apply_movement(delta: float) -> void:
+	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	var direction := (transform.basis * Vector3(input_dir.x, 0.0, input_dir.y)).normalized()
+	var target_velocity := direction * speed
+
+	velocity.x = lerp(velocity.x, target_velocity.x, acceleration * delta)
+	velocity.z = lerp(velocity.z, target_velocity.z, acceleration * delta)
+
+func _update_character_yaw(delta: float) -> void:
+	if not character_model:
+		return
+
+	if not body_yaw_initialized:
+		body_global_yaw = global_rotation.y + PI
+		body_yaw_initialized = true
+
+	var parent_global_yaw := global_rotation.y
+	var angle_diff := wrapf(parent_global_yaw - (body_global_yaw - PI), -PI, PI)
+	angle_diff = clamp(angle_diff, -deg_to_rad(75.0), deg_to_rad(75.0))
+	body_global_yaw = parent_global_yaw + PI - angle_diff
+
+	var horizontal_speed := Vector2(velocity.x, velocity.z).length()
+	var turn_speed := 10.0 if horizontal_speed > 0.1 else 4.0
+	body_global_yaw = lerp_angle(body_global_yaw, parent_global_yaw + PI, turn_speed * delta)
+	character_model.rotation.y = body_global_yaw - parent_global_yaw
 
 func _apply_perspective() -> void:
-	if not is_multiplayer_authority():
+	if not is_multiplayer_authority() or not spring_arm:
 		return
-	if not spring_arm:
-		return
-		
-	var model = get_node_or_null("ViewModel/character_model")
-	var base_eye_pos := Vector3(0.0, 1.8476624, 0.10041666)
-	
-	if is_third_person:
-		spring_arm.position = base_eye_pos + shoulder_offset
-		spring_arm.spring_length = third_person_distance
-		# Reset camera local transform — spring arm handles orbit
-		camera.position = Vector3.ZERO
-		camera.rotation = Vector3.ZERO
-		# Show character model
-		if model:
-			model.visible = true
-	else:
-		spring_arm.position = base_eye_pos
-		spring_arm.spring_length = 0.0
-		camera.position = Vector3.ZERO
-		camera.rotation = Vector3.ZERO
-		# Hide character model, show first-person arms
-		if model:
-			model.visible = false
+
+	spring_arm.spring_length = third_person_distance if is_third_person else 0.0
+	spring_arm.position = eye_position + shoulder_offset if is_third_person else eye_position
+	camera.position = Vector3.ZERO
+	camera.rotation = Vector3.ZERO
+
+	if character_model:
+		character_model.visible = is_third_person
+	if arm_container:
 		arm_container.visible = true
