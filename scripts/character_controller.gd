@@ -39,11 +39,20 @@ var body_yaw_initialized: bool = false
 func _enter_tree() -> void:
 	# Authority must be set here (not _ready) because _enter_tree fires
 	# top-down (parent → children), while _ready fires bottom-up.
-	if name.is_valid_int():
-		set_multiplayer_authority(name.to_int(), true)
+	#if name.is_valid_int():
+	#	%PlayerInput.set_multiplayer_authority(name.to_int())
+	pass
 
 func _ready() -> void:
-	if not is_multiplayer_authority():
+	await get_tree().process_frame
+	set_multiplayer_authority(1, true)
+	%PlayerInput.set_multiplayer_authority(name.to_int())
+	%MultiplayerSynchronizer.set_multiplayer_authority(name.to_int())
+	%MultiplayerSpawner.set_multiplayer_authority(name.to_int())
+	$RollbackSynchronizer.process_settings()
+	DisplayServer.window_set_title(name)
+	
+	if not %PlayerInput.is_multiplayer_authority():
 		camera.current = false
 		if has_node("CanvasLayer"):
 			%UICanvas.visible = false
@@ -60,8 +69,14 @@ func _ready() -> void:
 	# Apply initial perspective state
 	_apply_perspective()
 
+func _force_update_is_on_floor():
+	var old_velocity = velocity
+	velocity = Vector3.ZERO
+	move_and_slide()
+	velocity = old_velocity
+
 func _input(event: InputEvent) -> void:
-	if not is_multiplayer_authority():
+	if not %PlayerInput.is_multiplayer_authority():
 		return
 		
 	# Handle mouse looking
@@ -90,29 +105,6 @@ func _input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if is_multiplayer_authority():
-		# Apply gravity
-		if not is_on_floor():
-			velocity.y -= gravity * delta
-	
-		# Handle jump
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			velocity.y = jump_velocity
-	
-		# Get input direction
-		var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
-		var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-		
-		# Apply movement with smooth acceleration/deceleration
-		if direction:
-			velocity.x = lerp(velocity.x, direction.x * speed, acceleration * delta)
-			velocity.z = lerp(velocity.z, direction.z * speed, acceleration * delta)
-		else:
-			velocity.x = lerp(velocity.x, 0.0, acceleration * delta)
-			velocity.z = lerp(velocity.z, 0.0, acceleration * delta)
-	
-		move_and_slide()
-	
 	# Smoothly turn body in place or when moving
 	var model = get_node_or_null("ViewModel/character_model")
 	if model:
@@ -129,12 +121,37 @@ func _physics_process(delta: float) -> void:
 		var turn_speed = 10.0 if is_moving else 4.0
 		body_global_yaw = lerp_angle(body_global_yaw, parent_global_yaw + PI, turn_speed * delta)
 		model.rotation.y = body_global_yaw - parent_global_yaw
+	
+func _rollback_tick(delta, tick, is_fresh):
+	if multiplayer.is_server():
+		# Apply gravity
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+	
+		# Handle jump
+		if Input.is_action_just_pressed("jump") and is_on_floor():
+			velocity.y = jump_velocity
+	
+		# Get input direction
+		var input_dir: Vector2 = %PlayerInput.movement
+		var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+		
+		# Apply movement with smooth acceleration/deceleration
+		if direction:
+			velocity.x = lerp(velocity.x, direction.x * speed, acceleration * delta)
+			velocity.z = lerp(velocity.z, direction.z * speed, acceleration * delta)
+		else:
+			velocity.x = lerp(velocity.x, 0.0, acceleration * delta)
+			velocity.z = lerp(velocity.z, 0.0, acceleration * delta)
+		velocity *= NetworkTime.physics_factor
+		move_and_slide()
+		velocity /= NetworkTime.physics_factor
 
 func _toggle_perspective() -> void:
 	is_third_person = !is_third_person
 
 func _apply_perspective() -> void:
-	if not is_multiplayer_authority():
+	if not %PlayerInput.is_multiplayer_authority():
 		return
 	if not spring_arm:
 		return

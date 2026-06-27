@@ -35,9 +35,10 @@ func _ready() -> void:
 	if not muzzle_path.is_empty():
 		_muzzle = get_node_or_null(muzzle_path) as Node3D
 
-func setup(owner_body: CharacterBody3D, blender: PoseBlendComponent) -> void:
+func setup(owner_body: CharacterBody3D, blender: PoseBlendComponent, _camera: Camera3D) -> void:
 	owner_character = owner_body
 	pose_blender = blender
+	camera = _camera
 	if pose_blender:
 		if not definition:
 			definition = _create_fallback_definition()
@@ -133,7 +134,7 @@ func cancel() -> void:
 	if pose_blender:
 		pose_blender.set_charge_amount(0.0)
 
-func update_weapon(delta: float, _aim_camera: Camera3D) -> void:
+func update_weapon(delta: float) -> void:
 	if is_drawing:
 		var safe_draw_time = max(draw_time, 0.001)
 		_draw_elapsed = min(_draw_elapsed + delta, safe_draw_time)

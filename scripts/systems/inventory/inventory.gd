@@ -97,7 +97,7 @@ func handle_hotbar_select(i):
 
 # Handles left-click actions for a given slot in either container.
 func handle_left_click(slot_idx: int, cursor_stack: ItemStack, is_hotbar: bool):
-	if is_multiplayer_authority():
+	if %PlayerInput.is_multiplayer_authority():
 		var target_container = hotbar_container if is_hotbar else inventory_container
 		var target_slot = target_container[slot_idx]
 		
@@ -146,7 +146,7 @@ func _logic_left_click(target_slot: ItemStack, cursor_stack: ItemStack, is_hotba
 
 # Handles right-click actions for a given slot in either container.
 func handle_right_click(slot_idx: int, cursor_stack: ItemStack, is_hotbar: bool):
-	if is_multiplayer_authority():
+	if %PlayerInput.is_multiplayer_authority():
 		var target_container = hotbar_container if is_hotbar else inventory_container
 		var target_slot = target_container[slot_idx]
 		
@@ -287,7 +287,7 @@ func consume_item(item: InventoryItem, amount: int) -> int:
 # --- EQUIPMENT HANDLERS ---
 
 func handle_equipment_click(slot_idx: int, cursor_stack: ItemStack):
-	if is_multiplayer_authority():
+	if %PlayerInput.is_multiplayer_authority():
 		_logic_equipment_click(slot_idx, cursor_stack)
 		if multiplayer.is_server():
 			client_update_equipment_slot.rpc(slot_idx, equipment_container[slot_idx].serialize())
@@ -295,7 +295,7 @@ func handle_equipment_click(slot_idx: int, cursor_stack: ItemStack):
 		server_handle_equipment_click.rpc_id(get_multiplayer_authority(), slot_idx, cursor_stack.serialize())
 
 func handle_equipment_right_click(slot_idx: int):
-	if is_multiplayer_authority():
+	if %PlayerInput.is_multiplayer_authority():
 		_logic_equipment_right_click(slot_idx)
 		if multiplayer.is_server():
 			client_update_equipment_slot.rpc(slot_idx, equipment_container[slot_idx].serialize())

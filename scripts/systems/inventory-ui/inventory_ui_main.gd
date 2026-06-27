@@ -17,14 +17,17 @@ signal ui_hidden()
 
 
 func _ready() -> void:
-	if (!is_multiplayer_authority()):
-		$"../InventoryControl".queue_free()
-		queue_free()
-	inventory = get_node("../../Inventory")
+	#if (!$"../../PlayerInput".is_multiplayer_authority()):
+	#	$"../InventoryControl".queue_free()
+	#	queue_free()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	#inventory = %Inventory
 	picked_up_item_stack = ItemStack.new() # [cite: 20]
 	if !inventory:
 		printerr("InventoryUI: No Inventory node assigned!")
 		return
+		#inventory  = %Inventory
 	if !inventory.is_node_ready(): # [cite: 21]
 		await inventory.ready # [cite: 21]
 	inventory.inventory_updated.connect(update_all_cells) # [cite: 21]
@@ -214,17 +217,18 @@ func hide_inventory():
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _input(event: InputEvent) -> void:
-	if (is_multiplayer_authority()):
+	if ($"../../PlayerInput".is_multiplayer_authority()):
 		if event.is_action_pressed("toggle_inventory"):
 			print("Toggling inventory")
 			toggle_inventory()
-		for i in range(1, inventory.hotbar_size + 1):
-			if event.is_action_pressed("hotbar_" + str(i)):
-				if (inventory.hotbar_selection != i - 1):
-					inventory.handle_hotbar_select(i - 1)
+		if(inventory):
+			for i in range(1, inventory.hotbar_size + 1):
+				if event.is_action_pressed("hotbar_" + str(i)):
+					if (inventory.hotbar_selection != i - 1):
+						inventory.handle_hotbar_select(i - 1)
 
 func _unhandled_input(event: InputEvent):
-	if picked_up_item_stack.is_empty(): # [cite: 28]
+	if picked_up_item_stack and picked_up_item_stack.is_empty(): # [cite: 28]
 		return
 	
 	if event is InputEventMouseButton and event.is_pressed():

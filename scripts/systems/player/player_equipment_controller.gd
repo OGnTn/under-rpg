@@ -48,6 +48,7 @@ var equipped_item_node: Node3D = null
 func _ready() -> void:
 	# Wait for a frame to ensure all nodes are fully ready
 	await get_tree().process_frame
+	await get_tree().process_frame
 	
 	# Apply initial paths
 	apply_equipped_item_path(equipped_item_path)
@@ -56,7 +57,7 @@ func _ready() -> void:
 	if inventory:
 		inventory.equipment_updated.connect(_update_equipment_visuals)
 
-	if not is_multiplayer_authority():
+	if not %PlayerInput.is_multiplayer_authority():
 		set_process_input(false)
 		set_process_unhandled_input(false)
 		return
@@ -66,7 +67,7 @@ func _ready() -> void:
 		_on_hotbar_selection_updated(inventory.get_hotbar_selection())
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not is_multiplayer_authority():
+	if not %PlayerInput.is_multiplayer_authority():
 		return
 
 	# Handle weapon trigger
@@ -74,11 +75,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		if active_weapon:
-			active_weapon.primary_pressed()
+			active_weapon.primary_pressed.rpc()
 	
 	if event.is_action_released("attack"):
 		if active_weapon:
-			active_weapon.primary_released()
+			active_weapon.primary_released.rpc()
 
 	# Handle weapon switching
 	if event.is_action_pressed("next_weapon"):
@@ -93,9 +94,11 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	if active_weapon:
-		active_weapon.update_weapon(delta, player.camera)
+		active_weapon.update_weapon.rpc(delta)
 
 func _update_active_weapon() -> void:
+	if !%PlayerInput.is_multiplayer_authority():
+		return
 	active_weapon = null
 	
 	# Find the active weapon among the children of the Arm node
@@ -108,12 +111,12 @@ func _update_active_weapon() -> void:
 					break
 				
 	if active_weapon:
-		active_weapon.setup(player, pose_blend_component)
+		active_weapon.setup(player, pose_blend_component, player.camera)
 	elif pose_blend_component:
 		pose_blend_component.set_weapon(pose_blend_component.weapon_definition)
 
 func _on_hotbar_selection_updated(item_stack: ItemStack) -> void:
-	if not is_multiplayer_authority():
+	if not %PlayerInput.is_multiplayer_authority():
 		return
 	if item_stack and not item_stack.is_empty() and item_stack.item.scene:
 		equipped_item_path = item_stack.item.resource_path
@@ -121,6 +124,8 @@ func _on_hotbar_selection_updated(item_stack: ItemStack) -> void:
 		equipped_item_path = ""
 
 func apply_equipped_item_path(path: String) -> void:
+	if !%PlayerInput.is_multiplayer_authority():
+		return
 	# 1. Unequip/destroy previous equipped node
 	if is_instance_valid(equipped_item_node):
 		equipped_item_node.queue_free()
@@ -133,6 +138,7 @@ func apply_equipped_item_path(path: String) -> void:
 			for child in arm_node.get_children():
 				if child is Weapon:
 					child.visible = false
+					child.queue_free()
 				
 		# 3. If path is not empty, load and instantiate the scene
 		if path != "":
@@ -140,6 +146,7 @@ func apply_equipped_item_path(path: String) -> void:
 			if item and item.scene:
 				var instance = item.scene.instantiate()
 				if instance:
+					instance.name = "weapon"
 					# Add to Arm
 					arm_node.add_child(instance)
 					# Make sure it's visible
@@ -148,14 +155,14 @@ func apply_equipped_item_path(path: String) -> void:
 					if "item_resource" in instance:
 						instance.item_resource = item
 					# Set name to match the scene name (e.g. "Sword", "Bow", "Wand", "StoneAxe")
-					instance.name = item.scene.get_state().get_node_name(0)
+					#instance.name = item.scene.get_state().get_node_name(0)
 					# Keep track of it
 					equipped_item_node = instance
 				
 	_update_active_weapon()
 
 func _switch_weapon(direction: int) -> void:
-	if not is_multiplayer_authority():
+	if not %PlayerInput.is_multiplayer_authority():
 		return
 	if inventory:
 		var new_selection = (inventory.hotbar_selection + direction) % inventory.hotbar_size
@@ -164,7 +171,7 @@ func _switch_weapon(direction: int) -> void:
 		inventory.handle_hotbar_select(new_selection)
 
 func _update_equipment_visuals() -> void:
-	if not is_multiplayer_authority():
+	if not %PlayerInput.is_multiplayer_authority():
 		return
 		
 	var helmet_stack = inventory.equipment_container[0]

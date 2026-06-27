@@ -17,9 +17,10 @@ func _ready() -> void:
 				hurtbox = child
 				break
 
-func setup(owner_body: CharacterBody3D, blender: PoseBlendComponent) -> void:
+func setup(owner_body: CharacterBody3D, blender: PoseBlendComponent, _camera: Camera3D) -> void:
 	owner_character = owner_body
 	pose_blender = blender
+	camera = _camera
 	if pose_blender:
 		if definition:
 			pose_blender.set_weapon(definition)
@@ -38,13 +39,14 @@ func primary_pressed() -> void:
 		
 		# Determine attack type based on whether the owner is airborne
 		var attack_type = &"regular"
-		if owner_character and not owner_character.is_on_floor():
-			attack_type = &"downward"
-			
+		if owner_character:
+			owner_character._force_update_is_on_floor()
+			if not owner_character.is_on_floor():
+				attack_type = &"downward"
 		pose_blender.start_attack(attack_type)
 		attack_started.emit(attack_type)
 
-func update_weapon(_delta: float, _aim_camera: Camera3D) -> void:
+func update_weapon(_delta: float) -> void:
 	if not pose_blender or not hurtbox:
 		return
 		
@@ -73,7 +75,10 @@ func update_weapon(_delta: float, _aim_camera: Camera3D) -> void:
 					var hit_normal = (target_node.global_position - global_position).normalized()
 					_damage_target(target_node, damage, hit_pos, hit_normal)
 
+
 func _damage_target(target: Node, dmg: float, hit_pos: Vector3, hit_normal: Vector3) -> void:
+	if !multiplayer.is_server():
+		return
 	if target and not target.has_method("take_damage"):
 		if target.has_node("Hitbox"):
 			target = target.get_node("Hitbox")

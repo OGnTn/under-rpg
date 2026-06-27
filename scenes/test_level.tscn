@@ -33,7 +33,7 @@ material = ExtResource("2_paw1w")
 spawn_path = NodePath("../Players")
 
 [node name="NeutralMob" parent="." unique_id=1342851266 instance=ExtResource("1_paw1w")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.220969, -0.5, 0)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1496706358]
 environment = SubResource("Environment_ke0wg")
