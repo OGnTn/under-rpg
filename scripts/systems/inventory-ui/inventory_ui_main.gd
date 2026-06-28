@@ -246,6 +246,7 @@ func _unhandled_input(event: InputEvent):
 			if picked_up_item_stack.count <= 0:
 				picked_up_item_stack.empty_slot()
 			update_picked_up_item_display()
+			
 
 func open_external_inventory(inv: Inventory):
 	# 1. Show the UI if it isn't visible

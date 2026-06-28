@@ -1,15 +1,15 @@
-[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://bdf5gn33fkr3p"]
 
 [ext_resource type="PackedScene" uid="uid://b08dadm3rsr4j" path="res://scenes/items/equipment/cloth/cotton/cloth_cotton_helmet.tscn" id="1_scene"]
+[ext_resource type="Texture2D" uid="uid://ca3jwoo03cm08" path="res://assets/textures/items/icons/icon_cloth_cotton_helmet.tres" id="1_su7s4"]
 [ext_resource type="Script" uid="uid://d4b5y58kxevtr" path="res://scripts/systems/inventory/equipment_item.gd" id="2_script"]
-[ext_resource type="Texture2D" uid="uid://cts1mxclnv1oh" path="res://icon.svg" id="3_icon"]
+[ext_resource type="ArrayMesh" uid="uid://p1a5vm4nvrtg" path="res://assets/models/equipment/cloth_cotton_helmet.tres" id="2_su7s4"]
 
 [resource]
 script = ExtResource("2_script")
-slot_type = 0
 item_types = 8
 name = "Cloth Helmet"
 description = "A basic cotton cloth helmet."
-icon = ExtResource("3_icon")
+icon = ExtResource("1_su7s4")
 scene = ExtResource("1_scene")
-max_stack = 1
+mesh = ExtResource("2_su7s4")

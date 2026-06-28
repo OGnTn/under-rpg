@@ -28,12 +28,14 @@ _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]
 
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg", "res://addons/item_icon_generator/plugin.cfg", "res://addons/yard/plugin.cfg")
 
 [input]
 
@@ -122,6 +124,7 @@ toggle_perspective={
 
 3d/physics_engine="Jolt Physics"
 3d/physics_interpolation/scene_traversal="Legacy"
+common/physics_interpolation=true
 
 [rendering]
 

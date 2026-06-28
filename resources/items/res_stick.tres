@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://bycs3wfxyt6gv"]
+
+[ext_resource type="Texture2D" uid="uid://dcbwhxrdn5n4q" path="res://assets/textures/items/icons/icon_stick.png" id="1_2671e"]
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="1_qrct1"]
+[ext_resource type="ArrayMesh" uid="uid://c0l026im7c78i" path="res://assets/models/items/mesh_stick.tres" id="2_u6lvl"]
+
+[resource]
+script = ExtResource("1_qrct1")
+name = "Stick"
+description = "Wooden stick"
+icon = ExtResource("1_2671e")
+mesh = ExtResource("2_u6lvl")
+max_stack = 64
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"

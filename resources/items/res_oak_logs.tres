@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://bsmc3dxqx3ngq"]
+
+[ext_resource type="Texture2D" uid="uid://dub3vtfru1wkc" path="res://assets/textures/items/icons/icon_oak_logs.png" id="1_4u642"]
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="1_il2q5"]
+[ext_resource type="ArrayMesh" uid="uid://ds5sr2rmbf8uw" path="res://assets/models/items/mesh_oak_logs.tres" id="2_i7aag"]
+
+[resource]
+script = ExtResource("1_il2q5")
+name = "Oak Logs"
+icon = ExtResource("1_4u642")
+mesh = ExtResource("2_i7aag")
+max_stack = 64
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"

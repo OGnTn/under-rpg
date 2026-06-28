@@ -83,9 +83,9 @@ func refresh_list():
 	for data in display_list:
 		var card = recipe_card_scene.instantiate()
 		recipe_container.add_child(card)
-		card.get_child(0).setup(data.recipe, item_cell_scene)
-		card.get_child(0).update_state(data.can_craft, true)
-		card.get_child(0).recipe_clicked.connect(_on_recipe_card_clicked)
+		card.get_child(0).get_child(0).setup(data.recipe, item_cell_scene)
+		card.get_child(0).get_child(0).update_state(data.can_craft, true)
+		card.get_child(0).get_child(0).recipe_clicked.connect(_on_recipe_card_clicked)
 
 func _on_recipe_card_clicked(recipe: CraftingRecipe):
 	var inventory_list: Array[Inventory] = []

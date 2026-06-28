@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://b3cylxmxgyg83"]
+
+[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_jj6xx"]
+
+[resource]
+script = ExtResource("1_jj6xx")
+_version = 2
+_scan_rulesets = Array[Dictionary]([{
+&"allowed_file_extensions": Array[String]([".tres"]),
+&"class_restrictions": Array[StringName]([&"\"res://scripts/systems/crafting/crafting_recipe.gd\""]),
+&"recursive_scan": true,
+&"scan_directories": Array[String](["res://resources/recipes"]),
+&"scan_regex_exclude": "",
+&"scan_regex_include": ""
+}])
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://b6bm6cdobc8hx": &"recipe_oak_planks",
+&"uid://bljapg57wjqbs": &"recipe_flint_pickaxe",
+&"uid://c0m0ogp6uw46d": &"recipe_axe_hilt",
+&"uid://cq43fsrrrrx18": &"recipe_flint_sword",
+&"uid://dmo2efaelqnot": &"recipe_sword_hilt",
+&"uid://y3riuq7w4yxb": &"recipe_flint_axe"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"recipe_axe_hilt": &"uid://c0m0ogp6uw46d",
+&"recipe_flint_axe": &"uid://y3riuq7w4yxb",
+&"recipe_flint_pickaxe": &"uid://bljapg57wjqbs",
+&"recipe_flint_sword": &"uid://cq43fsrrrrx18",
+&"recipe_oak_planks": &"uid://b6bm6cdobc8hx",
+&"recipe_sword_hilt": &"uid://dmo2efaelqnot"
+})

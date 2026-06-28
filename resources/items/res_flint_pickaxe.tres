@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://bqhwktqkvqtw"]
+
+[ext_resource type="Texture2D" uid="uid://3did7704hjr1" path="res://assets/textures/items/icons/icon_flint_pickaxe.tres" id="1_5kfk2"]
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="1_w8otw"]
+[ext_resource type="ArrayMesh" uid="uid://l6b7s5x0sq4h" path="res://assets/models/items/mesh_flint_pickaxe.tres" id="2_ejj43"]
+[ext_resource type="PackedScene" uid="uid://b7jvbxtkcr8sn" path="res://scenes/items/tools/flint_pickaxe.tscn" id="3_ejj43"]
+
+[resource]
+script = ExtResource("1_w8otw")
+item_types = 4
+name = "Flint Pickaxe"
+description = "Simple pickaxe made from flint"
+icon = ExtResource("1_5kfk2")
+scene = ExtResource("3_ejj43")
+mesh = ExtResource("2_ejj43")
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"

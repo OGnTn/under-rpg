@@ -1,0 +1,163 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://b8tfm4sllgsct"
+path="res://.godot/imported/items.blend-c63c4c94903e952359d012e01906312c.scn"
+
+[deps]
+
+source_file="res://assets/models/collections/items.blend"
+dest_files=["res://.godot/imported/items.blend-c63c4c94903e952359d012e01906312c.scn"]
+
+[params]
+
+nodes/root_type=""
+nodes/root_name=""
+nodes/root_script=null
+mesh_library/use_node_names_as_mesh_names=false
+array_mesh/deduplicate_surfaces=true
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
+_subresources={
+"materials": {
+"m_gradient": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/materials/Material.tres",
+"use_external/path": "uid://cm0tgx0l8ylh1"
+}
+},
+"meshes": {
+"items_mesh_axe_hilt": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_axe_hilt.tres",
+"save_to_file/path": "uid://b0e8chy2j175h"
+},
+"items_mesh_bug_net": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_bug_net.tres",
+"save_to_file/path": "uid://bjftc6t503lki"
+},
+"items_mesh_flint": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_flint.tres",
+"save_to_file/path": "uid://cjffwwdsm2a87"
+},
+"items_mesh_flint_axe": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_flint_axe.tres",
+"save_to_file/path": "uid://bgrhgrtx5nswe"
+},
+"items_mesh_flint_pickaxe": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_flint_pickaxe.tres",
+"save_to_file/path": "uid://c2m5xlc31j1hf"
+},
+"items_mesh_flint_sword": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_flint_sword.tres",
+"save_to_file/path": "uid://cmfavd450idc4"
+},
+"items_mesh_flint_sword_hilt": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_sword_hilt.tres",
+"save_to_file/path": "uid://csc5wttvdj4c7"
+},
+"items_mesh_oak_logs": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_oak_logs.tres",
+"save_to_file/path": "uid://bv3ihpe23fvww"
+},
+"items_mesh_oak_planks": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_oak_planks.tres",
+"save_to_file/path": "uid://coe57ryl53k04"
+},
+"items_mesh_stick": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_stick.tres",
+"save_to_file/path": "uid://d2e8id22j21aq"
+}
+}
+}
+blender/nodes/visible=0
+blender/nodes/active_collection_only=false
+blender/nodes/punctual_lights=true
+blender/nodes/cameras=true
+blender/nodes/custom_properties=true
+blender/nodes/modifiers=1
+blender/meshes/vertex_colors=1
+blender/meshes/uvs=true
+blender/meshes/normals=true
+blender/meshes/export_geometry_nodes_instances=false
+blender/meshes/gpu_instances=false
+blender/meshes/tangents=true
+blender/meshes/skins=2
+blender/meshes/export_bones_deforming_mesh_only=false
+blender/materials/unpack_enabled=true
+blender/materials/export_materials=1
+blender/animation/limit_playback=true
+blender/animation/always_sample=true
+blender/animation/group_tracks=true
+gltf/naming_version=2
+gltf/texture_map_mode=1

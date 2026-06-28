@@ -5,6 +5,10 @@ class_name Inventory extends Node
 @export var inventory_size = 20
 @export var hotbar_size = 5
 
+@export_group("Testing")
+@export var testing_fill_inventory_on_start := false
+@export_dir var testing_item_scan_dir := "res://resources/items"
+
 # NEW: The allowed item types for the hotbar are now a single export variable.
 # You can configure this in the Inspector for your Inventory node.
 @export_flags("Weapon", "Consumable", "Tool", "Armor", "Quest Item", "Placeable") var allowed_hotbar_types: int = \
@@ -32,16 +36,42 @@ func _ready() -> void:
 	equipment_container.resize(3)
 	for i in range(3):
 		equipment_container[i] = ItemStack.new()
-	obtain_item(ItemStack.new(load("res://resources/items/res_stone_sword.tres"), 1))
-	obtain_item(ItemStack.new(load("res://resources/items/res_stone_axe.tres"), 1))
-	obtain_item(ItemStack.new(load("res://resources/items/res_oak_bow.tres"), 1))
-	obtain_item(ItemStack.new(load("res://resources/items/res_cloth_cotton_helmet.tres"), 1))
-	obtain_item(ItemStack.new(load("res://resources/items/res_cloth_cotton_chest.tres"), 1))
-	obtain_item(ItemStack.new(load("res://resources/items/res_cloth_cotton_boot.tres"), 1))
-	obtain_item(ItemStack.new(load("res://resources/items/res_plate_iron_helmet.tres"), 1))
-	obtain_item(ItemStack.new(load("res://resources/items/res_plate_iron_chest.tres"), 1))
-	obtain_item(ItemStack.new(load("res://resources/items/res_plate_iron_boot.tres"), 1))
-	#obtain_item(ItemStack.new(load("res://resources/items/res_fire_wand.tres"), 1))
+
+	if testing_fill_inventory_on_start:
+		_fill_inventory_for_testing()
+
+func _fill_inventory_for_testing() -> void:
+	var item_paths := _find_inventory_item_paths(testing_item_scan_dir)
+	item_paths.sort()
+
+	var items_to_add = min(inventory_size, item_paths.size())
+	for i in range(items_to_add):
+		var item := load(item_paths[i]) as InventoryItem
+		if item != null:
+			obtain_item(ItemStack.new(item, 1))
+
+func _find_inventory_item_paths(scan_dir: String) -> PackedStringArray:
+	var item_paths := PackedStringArray()
+	var dir := DirAccess.open(scan_dir)
+	if dir == null:
+		push_warning("Could not open testing item scan directory: %s" % scan_dir)
+		return item_paths
+
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while not file_name.is_empty():
+		var path := scan_dir.path_join(file_name)
+		if dir.current_is_dir():
+			if not file_name.begins_with("."):
+				item_paths.append_array(_find_inventory_item_paths(path))
+		elif file_name.get_extension() == "tres":
+			var item := load(path) as InventoryItem
+			if item != null:
+				item_paths.append(path)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+	return item_paths
 
 # The main function for adding an item to the main inventory.
 # Returns the ItemStack that couldn't be added, if any.

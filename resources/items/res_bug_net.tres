@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://cmv1wafuhwu1l"]
+
+[ext_resource type="Texture2D" uid="uid://cixkf6m4rf3u1" path="res://assets/textures/items/icons/icon_bug_net.tres" id="1_or38d"]
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="1_tb0xc"]
+[ext_resource type="ArrayMesh" uid="uid://cbg4jjxa51ptj" path="res://assets/models/items/mesh_bug_net.tres" id="2_vodby"]
+[ext_resource type="PackedScene" uid="uid://b1ghmgv0d756q" path="res://scenes/items/tools/bug_net.tscn" id="3_vodby"]
+
+[resource]
+script = ExtResource("1_tb0xc")
+item_types = 4
+name = "Bug Net"
+icon = ExtResource("1_or38d")
+scene = ExtResource("3_vodby")
+mesh = ExtResource("2_vodby")
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"

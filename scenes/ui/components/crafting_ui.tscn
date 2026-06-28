@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bdjkcw70040am"]
 
 [ext_resource type="Script" uid="uid://daec4thdtj1mi" path="res://scripts/systems/crafting-ui/crafting_ui.gd" id="1_script"]
-[ext_resource type="PackedScene" uid="uid://mcvcx75nkrrn" path="res://scenes/ui/components/recipe_card.tscn" id="2_card"]
+[ext_resource type="PackedScene" uid="uid://ck8d8i0ib13nw" path="res://scenes/ui/components/recipe_card.tscn" id="2_card"]
 [ext_resource type="PackedScene" uid="uid://cu2jqbijc16v0" path="res://scripts/systems/inventory/item_cell.tscn" id="3_cell"]
 
 [node name="CraftingUI" type="PanelContainer" unique_id=1499812368]
@@ -30,6 +30,8 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 0
+mouse_force_pass_scroll_events = false
 
 [node name="RecipeListContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer" unique_id=2117082760]
 unique_name_in_owner = true

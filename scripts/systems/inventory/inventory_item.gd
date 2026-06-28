@@ -18,7 +18,7 @@ enum Type {
 @export var description: String
 @export var icon: Texture2D
 @export var scene: PackedScene
-#@export var mesh: Mesh
+@export var mesh: Mesh
 @export var max_stack: int = 1
 
 # This helper function still works perfectly with the enum.

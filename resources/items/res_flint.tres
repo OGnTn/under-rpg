@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://tygud6l55x0h"]
+
+[ext_resource type="Texture2D" uid="uid://nao6esc5opdf" path="res://assets/textures/items/icons/icon_flint.tres" id="1_cjqsa"]
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="1_mh7mm"]
+[ext_resource type="ArrayMesh" uid="uid://crbk8kyalnhxu" path="res://assets/models/items/mesh_flint.tres" id="2_cjqsa"]
+
+[resource]
+script = ExtResource("1_mh7mm")
+name = "Flint"
+description = "A piece of flint"
+icon = ExtResource("1_cjqsa")
+mesh = ExtResource("2_cjqsa")
+max_stack = 64
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"

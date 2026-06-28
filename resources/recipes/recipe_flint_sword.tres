@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CraftingRecipe" format=3 uid="uid://cq43fsrrrrx18"]
+
+[ext_resource type="Script" uid="uid://dppe4fpc1ei7n" path="res://scripts/systems/crafting/recipe_ingredient.gd" id="1_bpgxg"]
+[ext_resource type="Resource" uid="uid://p13e6nuuj20s" path="res://resources/items/res_sword_hilt.tres" id="2_gtrfw"]
+[ext_resource type="Script" uid="uid://dv7ybhb7iob4v" path="res://scripts/systems/crafting/crafting_recipe.gd" id="2_xb7rh"]
+[ext_resource type="Resource" uid="uid://tygud6l55x0h" path="res://resources/items/res_flint.tres" id="3_s7f0c"]
+[ext_resource type="Resource" uid="uid://1mnufdbc1gac" path="res://resources/items/res_flint_sword.tres" id="4_n6fow"]
+
+[sub_resource type="Resource" id="Resource_8o4av"]
+script = ExtResource("1_bpgxg")
+item = ExtResource("2_gtrfw")
+metadata/_custom_type_script = "uid://dppe4fpc1ei7n"
+
+[sub_resource type="Resource" id="Resource_vpsf5"]
+script = ExtResource("1_bpgxg")
+item = ExtResource("3_s7f0c")
+quantity = 2
+metadata/_custom_type_script = "uid://dppe4fpc1ei7n"
+
+[sub_resource type="Resource" id="Resource_xi8ea"]
+script = ExtResource("1_bpgxg")
+item = ExtResource("4_n6fow")
+metadata/_custom_type_script = "uid://dppe4fpc1ei7n"
+
+[resource]
+script = ExtResource("2_xb7rh")
+name = "Flint Sword"
+ingredients = Array[ExtResource("1_bpgxg")]([SubResource("Resource_8o4av"), SubResource("Resource_vpsf5")])
+results = Array[ExtResource("1_bpgxg")]([SubResource("Resource_xi8ea")])
+metadata/_custom_type_script = "uid://dv7ybhb7iob4v"

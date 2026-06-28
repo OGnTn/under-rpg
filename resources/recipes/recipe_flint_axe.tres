@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CraftingRecipe" format=3 uid="uid://y3riuq7w4yxb"]
+
+[ext_resource type="Script" uid="uid://dppe4fpc1ei7n" path="res://scripts/systems/crafting/recipe_ingredient.gd" id="1_pdsvm"]
+[ext_resource type="Resource" uid="uid://tygud6l55x0h" path="res://resources/items/res_flint.tres" id="2_5r644"]
+[ext_resource type="Script" uid="uid://dv7ybhb7iob4v" path="res://scripts/systems/crafting/crafting_recipe.gd" id="2_ldli7"]
+[ext_resource type="Resource" uid="uid://cnjauhp5176c6" path="res://resources/items/res_axe_hilt.tres" id="3_a5vgn"]
+[ext_resource type="Resource" uid="uid://d11pbg3o8mbbw" path="res://resources/items/res_flint_axe.tres" id="4_toglf"]
+
+[sub_resource type="Resource" id="Resource_8o4av"]
+script = ExtResource("1_pdsvm")
+item = ExtResource("2_5r644")
+metadata/_custom_type_script = "uid://dppe4fpc1ei7n"
+
+[sub_resource type="Resource" id="Resource_vpsf5"]
+script = ExtResource("1_pdsvm")
+item = ExtResource("3_a5vgn")
+metadata/_custom_type_script = "uid://dppe4fpc1ei7n"
+
+[sub_resource type="Resource" id="Resource_xi8ea"]
+script = ExtResource("1_pdsvm")
+item = ExtResource("4_toglf")
+metadata/_custom_type_script = "uid://dppe4fpc1ei7n"
+
+[resource]
+script = ExtResource("2_ldli7")
+name = "Flint Axe"
+ingredients = Array[ExtResource("1_pdsvm")]([SubResource("Resource_8o4av"), SubResource("Resource_vpsf5")])
+results = Array[ExtResource("1_pdsvm")]([SubResource("Resource_xi8ea")])
+metadata/_custom_type_script = "uid://dv7ybhb7iob4v"

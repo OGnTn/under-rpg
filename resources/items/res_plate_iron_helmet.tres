@@ -1,15 +1,15 @@
-[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://ei27teyw1rah"]
 
+[ext_resource type="ArrayMesh" uid="uid://gfvylwvltrdi" path="res://assets/models/equipment/plate_iron_helmet.tres" id="1_bqcko"]
+[ext_resource type="Texture2D" uid="uid://6burafj8blsg" path="res://assets/textures/items/icons/icon_plate_iron_helmet.tres" id="1_ihspx"]
 [ext_resource type="PackedScene" uid="uid://dqi7x7bsiqlec" path="res://scenes/items/equipment/plate/iron/plate_iron_helmet.tscn" id="1_scene"]
 [ext_resource type="Script" uid="uid://d4b5y58kxevtr" path="res://scripts/systems/inventory/equipment_item.gd" id="2_script"]
-[ext_resource type="Texture2D" uid="uid://cts1mxclnv1oh" path="res://icon.svg" id="3_icon"]
 
 [resource]
 script = ExtResource("2_script")
-slot_type = 0
 item_types = 8
 name = "Plate Helmet"
 description = "A heavy iron plate helmet."
-icon = ExtResource("3_icon")
+icon = ExtResource("1_ihspx")
 scene = ExtResource("1_scene")
-max_stack = 1
+mesh = ExtResource("1_bqcko")

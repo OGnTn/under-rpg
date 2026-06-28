@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CraftingRecipe" format=3 uid="uid://dmo2efaelqnot"]
+
+[ext_resource type="Script" uid="uid://dppe4fpc1ei7n" path="res://scripts/systems/crafting/recipe_ingredient.gd" id="1_amyau"]
+[ext_resource type="Script" uid="uid://dv7ybhb7iob4v" path="res://scripts/systems/crafting/crafting_recipe.gd" id="2_mud23"]
+[ext_resource type="Resource" uid="uid://tygud6l55x0h" path="res://resources/items/res_flint.tres" id="2_uoleb"]
+[ext_resource type="Resource" uid="uid://bycs3wfxyt6gv" path="res://resources/items/res_stick.tres" id="3_7vosx"]
+[ext_resource type="Resource" uid="uid://p13e6nuuj20s" path="res://resources/items/res_sword_hilt.tres" id="4_okhxa"]
+
+[sub_resource type="Resource" id="Resource_8o4av"]
+script = ExtResource("1_amyau")
+item = ExtResource("2_uoleb")
+quantity = 2
+metadata/_custom_type_script = "uid://dppe4fpc1ei7n"
+
+[sub_resource type="Resource" id="Resource_vpsf5"]
+script = ExtResource("1_amyau")
+item = ExtResource("3_7vosx")
+metadata/_custom_type_script = "uid://dppe4fpc1ei7n"
+
+[sub_resource type="Resource" id="Resource_xi8ea"]
+script = ExtResource("1_amyau")
+item = ExtResource("4_okhxa")
+metadata/_custom_type_script = "uid://dppe4fpc1ei7n"
+
+[resource]
+script = ExtResource("2_mud23")
+name = "Sword Hilt"
+ingredients = Array[ExtResource("1_amyau")]([SubResource("Resource_8o4av"), SubResource("Resource_vpsf5")])
+results = Array[ExtResource("1_amyau")]([SubResource("Resource_xi8ea")])
+metadata/_custom_type_script = "uid://dv7ybhb7iob4v"

@@ -1,63 +1,87 @@
-[gd_scene format=3 uid="uid://mcvcx75nkrrn"]
+[gd_scene format=3 uid="uid://ck8d8i0ib13nw"]
 
 [ext_resource type="Script" uid="uid://jrhdtgqv1l4e" path="res://scripts/systems/crafting-ui/recipe_card.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://cu2jqbijc16v0" path="res://scripts/systems/inventory/item_cell.tscn" id="2_cell"]
 
-[node name="RecipeCard" type="MarginContainer" unique_id=1698695520]
-offset_right = 295.0
-offset_bottom = 72.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2pmii"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.101960786, 0.101960786, 0.101960786, 0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="RecipeCard" type="PanelContainer" unique_id=983347432]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1685.0
+offset_bottom = -1039.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1698695520]
+layout_mode = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="RecipeCard" type="Button" parent="." unique_id=1779136222]
+[node name="RecipeCardButton" type="Button" parent="MarginContainer" unique_id=1779136222]
+unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_2pmii")
 script = ExtResource("1_script")
 item_cell_scene = ExtResource("2_cell")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=44530551]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer" unique_id=44530551]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="InputContainer" type="HBoxContainer" parent="HBoxContainer" unique_id=1781897429]
+[node name="InputContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=1781897429]
 unique_name_in_owner = true
 layout_mode = 2
-mouse_filter = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 
-[node name="ItemCell" parent="HBoxContainer/InputContainer" unique_id=541804252 instance=ExtResource("2_cell")]
+[node name="ItemCell" parent="MarginContainer/HBoxContainer/InputContainer" unique_id=541804252 instance=ExtResource("2_cell")]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Label" type="Label" parent="HBoxContainer" unique_id=2138560174]
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer" unique_id=2138560174]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "->"
-mouse_filter = 2
 
-[node name="OutputContainer" type="HBoxContainer" parent="HBoxContainer" unique_id=123013952]
+[node name="OutputContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer" unique_id=123013952]
 unique_name_in_owner = true
 layout_mode = 2
-mouse_filter = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 
-[node name="OutputIcon" type="TextureRect" parent="HBoxContainer/OutputContainer" unique_id=806356712]
+[node name="OutputIcon" type="TextureRect" parent="MarginContainer/HBoxContainer/OutputContainer" unique_id=806356712]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 
-[node name="ItemCell" parent="HBoxContainer/OutputContainer" unique_id=621042064 instance=ExtResource("2_cell")]
+[node name="ItemCell" parent="MarginContainer/HBoxContainer/OutputContainer" unique_id=621042064 instance=ExtResource("2_cell")]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="RecipeName" type="Label" parent="HBoxContainer" unique_id=1462463824]
+[node name="RecipeName" type="Label" parent="MarginContainer/HBoxContainer" unique_id=1462463824]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Recipe Name"
 vertical_alignment = 1
-mouse_filter = 2

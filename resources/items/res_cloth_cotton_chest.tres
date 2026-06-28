@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EquipmentItem" format=3]
+[gd_resource type="Resource" script_class="EquipmentItem" format=3 uid="uid://b7a1wxnaqh86s"]
 
+[ext_resource type="Texture2D" uid="uid://ccxqux2fs5q5h" path="res://assets/textures/items/icons/icon_cloth_cotton_chest.tres" id="1_eifkl"]
 [ext_resource type="PackedScene" uid="uid://dqq67bu7bokkt" path="res://scenes/items/equipment/cloth/cotton/cloth_cotton_chest.tscn" id="1_scene"]
+[ext_resource type="ArrayMesh" uid="uid://m4ovnp7greng" path="res://assets/models/equipment/cloth_cotton_chest.tres" id="2_eifkl"]
 [ext_resource type="Script" uid="uid://d4b5y58kxevtr" path="res://scripts/systems/inventory/equipment_item.gd" id="2_script"]
-[ext_resource type="Texture2D" uid="uid://cts1mxclnv1oh" path="res://icon.svg" id="3_icon"]
 
 [resource]
 script = ExtResource("2_script")
@@ -10,6 +11,6 @@ slot_type = 1
 item_types = 8
 name = "Cloth Chest"
 description = "A basic cotton cloth chestplate."
-icon = ExtResource("3_icon")
+icon = ExtResource("1_eifkl")
 scene = ExtResource("1_scene")
-max_stack = 1
+mesh = ExtResource("2_eifkl")

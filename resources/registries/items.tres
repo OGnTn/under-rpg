@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="Registry" format=3 uid="uid://dfjkmawbyus2i"]
+
+[ext_resource type="Script" uid="uid://dqtv77mng5dyh" path="res://addons/yard/registry.gd" id="1_jle1m"]
+
+[resource]
+script = ExtResource("1_jle1m")
+_version = 2
+_scan_rulesets = Array[Dictionary]([{
+&"allowed_file_extensions": Array[String]([".tres"]),
+&"class_restrictions": Array[StringName]([&"\"res://scripts/systems/inventory/inventory_item.gd\"", &"\"res://scripts/systems/inventory/equipment_item.gd\""]),
+&"recursive_scan": true,
+&"scan_directories": Array[String](["res://resources/items"]),
+&"scan_regex_exclude": "",
+&"scan_regex_include": ""
+}])
+_uids_to_string_ids = Dictionary[StringName, StringName]({
+&"uid://1mnufdbc1gac": &"res_flint_sword",
+&"uid://b5234w4cureuk": &"res_oak_bow",
+&"uid://b7a1wxnaqh86s": &"res_cloth_cotton_chest",
+&"uid://bdf5gn33fkr3p": &"res_cloth_cotton_helmet",
+&"uid://be654h1grb8dw": &"res_cloth_cotton_boot",
+&"uid://bqhwktqkvqtw": &"res_flint_pickaxe",
+&"uid://bsmc3dxqx3ngq": &"res_oak_logs",
+&"uid://bycs3wfxyt6gv": &"res_stick",
+&"uid://cfjnrlmbpsaai": &"res_oak_planks",
+&"uid://cmv1wafuhwu1l": &"res_bug_net",
+&"uid://cnjauhp5176c6": &"res_axe_hilt",
+&"uid://d11pbg3o8mbbw": &"res_flint_axe",
+&"uid://ei27teyw1rah": &"res_plate_iron_helmet",
+&"uid://ins6c4w88o6o": &"res_plate_iron_boot",
+&"uid://p13e6nuuj20s": &"res_sword_hilt",
+&"uid://qclh160mca83": &"res_plate_iron_chest",
+&"uid://tygud6l55x0h": &"res_flint"
+})
+_string_ids_to_uids = Dictionary[StringName, StringName]({
+&"res_axe_hilt": &"uid://cnjauhp5176c6",
+&"res_bug_net": &"uid://cmv1wafuhwu1l",
+&"res_cloth_cotton_boot": &"uid://be654h1grb8dw",
+&"res_cloth_cotton_chest": &"uid://b7a1wxnaqh86s",
+&"res_cloth_cotton_helmet": &"uid://bdf5gn33fkr3p",
+&"res_flint": &"uid://tygud6l55x0h",
+&"res_flint_axe": &"uid://d11pbg3o8mbbw",
+&"res_flint_pickaxe": &"uid://bqhwktqkvqtw",
+&"res_flint_sword": &"uid://1mnufdbc1gac",
+&"res_oak_bow": &"uid://b5234w4cureuk",
+&"res_oak_logs": &"uid://bsmc3dxqx3ngq",
+&"res_oak_planks": &"uid://cfjnrlmbpsaai",
+&"res_plate_iron_boot": &"uid://ins6c4w88o6o",
+&"res_plate_iron_chest": &"uid://qclh160mca83",
+&"res_plate_iron_helmet": &"uid://ei27teyw1rah",
+&"res_stick": &"uid://bycs3wfxyt6gv",
+&"res_sword_hilt": &"uid://p13e6nuuj20s"
+})

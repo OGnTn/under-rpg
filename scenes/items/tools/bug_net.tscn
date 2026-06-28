@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://b1ghmgv0d756q"]
+
+[ext_resource type="Script" uid="uid://udvgluhnpbpr" path="res://scripts/melee_weapon.gd" id="1_7klms"]
+[ext_resource type="Script" uid="uid://gwasg2o1cwub" path="res://scripts/weapon_attack_definition.gd" id="2_xlptq"]
+[ext_resource type="Script" uid="uid://cbxlbjronabvs" path="res://scripts/weapon_pose_key.gd" id="3_lqv0t"]
+[ext_resource type="Script" uid="uid://bxsyumhpord72" path="res://scripts/weapon_definition.gd" id="4_r1ri3"]
+[ext_resource type="ArrayMesh" uid="uid://cbg4jjxa51ptj" path="res://assets/models/items/mesh_bug_net.tres" id="5_7klms"]
+
+[sub_resource type="Curve" id="Curve_xlptq"]
+_data = [Vector2(0.006849315, 0), 0.0, 1.0257771, 0, 0, Vector2(0.7470449, 0.20909095), 0.0, 0.0, 0, 0, Vector2(0.99657536, 1), 3.4893494, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Resource" id="Resource_lqv0t"]
+script = ExtResource("3_lqv0t")
+animation_name = &"r_rest"
+
+[sub_resource type="Resource" id="Resource_r1ri3"]
+script = ExtResource("3_lqv0t")
+progress = 0.25
+animation_name = &"r_windup"
+
+[sub_resource type="Resource" id="Resource_6ka71"]
+script = ExtResource("3_lqv0t")
+progress = 0.5
+animation_name = &"r_strike"
+
+[sub_resource type="Resource" id="Resource_8ha78"]
+script = ExtResource("3_lqv0t")
+progress = 1.0
+animation_name = &"r_rest"
+
+[sub_resource type="Resource" id="Resource_nw0hp"]
+script = ExtResource("2_xlptq")
+pose_keys = Array[ExtResource("3_lqv0t")]([SubResource("Resource_lqv0t"), SubResource("Resource_r1ri3"), SubResource("Resource_6ka71"), SubResource("Resource_8ha78")])
+duration = 2.0
+enthusiasm = 1.0
+curve = SubResource("Curve_xlptq")
+
+[sub_resource type="Resource" id="Resource_wtk1r"]
+script = ExtResource("4_r1ri3")
+hurtbox_path = NodePath("Hurtbox")
+attacks = Array[ExtResource("2_xlptq")]([SubResource("Resource_nw0hp")])
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ke0wg"]
+size = Vector3(0.4061203, 0.50514984, 0.5017395)
+
+[node name="BugNet" type="Node3D" unique_id=118562519]
+script = ExtResource("1_7klms")
+definition = SubResource("Resource_wtk1r")
+
+[node name="Hurtbox" type="Area3D" parent="." unique_id=1464427476]
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hurtbox" unique_id=1427156212]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0021765977, 0.9646052, -0.07739794)
+shape = SubResource("BoxShape3D_ke0wg")
+
+[node name="Visuals" type="Node3D" parent="." unique_id=846235181]
+transform = Transform3D(1.8, 0, 0, 0, 1.8, 0, 0, 0, 1.8, 0, 0, 0)
+
+[node name="stone_axe" type="MeshInstance3D" parent="Visuals" unique_id=2012589737]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+mesh = ExtResource("5_7klms")

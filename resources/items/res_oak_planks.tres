@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://cfjnrlmbpsaai"]
+
+[ext_resource type="Texture2D" uid="uid://duudhnr83goj" path="res://assets/textures/items/icons/icon_oak_planks.png" id="1_7v1tv"]
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="1_yg7oi"]
+[ext_resource type="ArrayMesh" uid="uid://be54fj5xdugip" path="res://assets/models/items/mesh_oak_planks.tres" id="2_kn2ck"]
+
+[resource]
+script = ExtResource("1_yg7oi")
+icon = ExtResource("1_7v1tv")
+mesh = ExtResource("2_kn2ck")
+max_stack = 64
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"

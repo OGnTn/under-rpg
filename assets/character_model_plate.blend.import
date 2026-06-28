@@ -40,6 +40,13 @@ materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
 _subresources={
+"materials": {
+"Material": {
+"use_external/enabled": true,
+"use_external/fallback_path": "res://assets/materials/Material.tres",
+"use_external/path": "uid://cm0tgx0l8ylh1"
+}
+},
 "meshes": {
 "character_model_plate_Cube_006": {
 "generate/lightmap_uv": 0,
@@ -49,15 +56,6 @@ _subresources={
 "save_to_file/enabled": true,
 "save_to_file/fallback_path": "res://assets/models/equipment/plate_iron_chest.tres",
 "save_to_file/path": "uid://cg5gnkomkp4dl"
-},
-"character_model_plate_Cube_009": {
-"generate/lightmap_uv": 0,
-"generate/lods": 0,
-"generate/shadow_meshes": 0,
-"lods/normal_merge_angle": 20.0,
-"save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://assets/models/equipment/plate_iron_belt.tres",
-"save_to_file/path": "uid://cjrtxouog0d06"
 },
 "character_model_plate_Cube_010": {
 "generate/lightmap_uv": 0,
