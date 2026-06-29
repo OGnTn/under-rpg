@@ -93,9 +93,59 @@ func _configure_local_player(is_local: bool) -> void:
 
 	if is_local:
 		capture_mouse()
+		var inv_ui = ui_canvas.get_node_or_null("InventoryControl")
+		if inv_ui:
+			inv_ui.item_dropped_outside.connect(_on_item_dropped_outside)
 	else:
 		character_model.visible = true
 		arm_container.visible = true
+
+func _on_item_dropped_outside(item_stack: ItemStack) -> void:
+	if item_stack and not item_stack.is_empty() and item_stack.item:
+		server_drop_item.rpc(item_stack.item.resource_path, item_stack.count)
+
+@rpc("any_peer", "call_local", "reliable")
+func server_drop_item(item_path: String, count: int) -> void:
+	if not multiplayer.is_server():
+		return
+	
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != name.to_int():
+		return
+		
+	var item_resource = load(item_path) as InventoryItem
+	if not item_resource:
+		return
+		
+	# Spawn position: in front of player
+	var spawn_pos = global_position + Vector3.UP * 1.5 - transform.basis.z * 1.5
+	var throw_dir = -transform.basis.z
+	var initial_velocity = (throw_dir * 3.0) + Vector3(0, 3.0, 0)
+	
+	var drop_name = "item_drop_dropped_" + str(sender_id) + "_" + str(Time.get_ticks_usec()) + "_" + str(randi())
+	
+	var world_item_scene = preload("res://scenes/world_objects/world_item.tscn")
+	var drop = world_item_scene.instantiate()
+	drop.name = drop_name
+	
+	var spawn_parent = null
+	var level = get_tree().current_scene
+	if level:
+		spawn_parent = level.get_node_or_null("%WorldItems")
+		if not spawn_parent:
+			spawn_parent = level.find_child("WorldItems", true, false)
+		if not spawn_parent:
+			spawn_parent = level
+			
+	if not spawn_parent:
+		spawn_parent = get_parent()
+		
+	spawn_parent.add_child(drop)
+	drop.global_position = spawn_pos
+	
+	var drop_component = drop.get_node_or_null("WorldItemComponent")
+	if drop_component:
+		drop_component.setup(ItemStack.new(item_resource, count), initial_velocity)
 
 func _apply_look(mouse_delta: Vector2) -> void:
 	rotate_y(-mouse_delta.x * mouse_sensitivity)
