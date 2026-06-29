@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://6vm7r131c8ad"]
+
+[ext_resource type="Texture2D" uid="uid://dtwqy767mg03" path="res://assets/textures/items/icons/icon_string.tres" id="1_inl83"]
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="1_v3e3l"]
+[ext_resource type="ArrayMesh" uid="uid://c0be53m7yysjr" path="res://assets/models/items/mesh_string.tres" id="2_pexki"]
+
+[resource]
+script = ExtResource("1_v3e3l")
+name = "String"
+icon = ExtResource("1_inl83")
+mesh = ExtResource("2_pexki")
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"

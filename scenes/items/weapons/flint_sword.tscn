@@ -1,4 +1,4 @@
-[gd_scene format=4 uid="uid://dbt1svk24ikvj"]
+[gd_scene format=4 uid="uid://b5do6vs2imlat"]
 
 [ext_resource type="Script" uid="uid://udvgluhnpbpr" path="res://scripts/melee_weapon.gd" id="1_k5whp"]
 [ext_resource type="Script" uid="uid://gwasg2o1cwub" path="res://scripts/weapon_attack_definition.gd" id="2_1yp6w"]

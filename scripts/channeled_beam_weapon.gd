@@ -90,10 +90,10 @@ func _tick(delta: float) -> void:
 		if is_multiplayer_authority() and channeled_hurtbox and channeled_hurtbox.monitoring:
 			var targets = []
 			for body in channeled_hurtbox.get_overlapping_bodies():
-				if body != owner_character and not targets.has(body):
+				if not DamageResolver.is_target_owned_by(body, owner_character) and not targets.has(body):
 					targets.append(body)
 			for area in channeled_hurtbox.get_overlapping_areas():
-				if area != owner_character and not targets.has(area):
+				if not DamageResolver.is_target_owned_by(area, owner_character) and not targets.has(area):
 					targets.append(area)
 					
 			var tick_damage = damage_per_second * damage_tick_rate

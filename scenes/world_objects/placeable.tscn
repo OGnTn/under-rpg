@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://0ywjdrexe3r4"]
+
+[ext_resource type="Script" uid="uid://ywekou81er6x" path="res://scripts/systems/entities/interactable.gd" id="1_4qve0"]
+[ext_resource type="ArrayMesh" uid="uid://21aq3ucaovpi" path="res://assets/models/items/mesh_workbench.tres" id="2_d42jd"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ke0wg"]
+size = Vector3(0.62390137, 0.59051514, 0.6463623)
+
+[node name="Placeable" type="Node3D" unique_id=1894132232]
+
+[node name="Interactable" type="Area3D" parent="." unique_id=1721225623]
+script = ExtResource("1_4qve0")
+metadata/_custom_type_script = "uid://ywekou81er6x"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactable" unique_id=1645178070]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00592041, 0.29592896, -0.0010375977)
+shape = SubResource("BoxShape3D_ke0wg")
+
+[node name="Visuals" type="Node3D" parent="." unique_id=1709841623]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Visuals" unique_id=1938293989]
+mesh = ExtResource("2_d42jd")

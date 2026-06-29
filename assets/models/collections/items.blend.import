@@ -137,6 +137,24 @@ _subresources={
 "save_to_file/enabled": true,
 "save_to_file/fallback_path": "res://assets/models/items/mesh_stick.tres",
 "save_to_file/path": "uid://d2e8id22j21aq"
+},
+"items_mesh_string": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_string.tres",
+"save_to_file/path": "uid://ycm8lo2qdbps"
+},
+"items_mesh_workbench": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/items/mesh_workbench.tres",
+"save_to_file/path": "uid://dafx4yq5wrkjr"
 }
 }
 }

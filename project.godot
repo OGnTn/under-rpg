@@ -19,6 +19,11 @@ config/icon="res://icon.svg"
 
 CraftingManager="*uid://ckhgiisbvhsg"
 NetworkManager="*res://scripts/systems/networking/network_manager.gd"
+NetworkTime="*uid://cnqdxyjptkfvp"
+NetworkTimeSynchronizer="*uid://5rmn2ik3kjo8"
+NetworkRollback="*uid://gas743comroj"
+NetworkEvents="*uid://bdmobxxptryj0"
+NetworkPerformance="*uid://cqgf7aqmjfoa3"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]

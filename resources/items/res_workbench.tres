@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="InventoryItem" format=3 uid="uid://cr0srawh85b8v"]
+
+[ext_resource type="Texture2D" uid="uid://4irbknm0kxn8" path="res://assets/textures/items/icons/icon_workbench.tres" id="1_4knqv"]
+[ext_resource type="ArrayMesh" uid="uid://21aq3ucaovpi" path="res://assets/models/items/mesh_workbench.tres" id="1_ocakv"]
+[ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="1_qrkuf"]
+[ext_resource type="PackedScene" uid="uid://dbt1svk24ikvj" path="res://scenes/items/placeables/workbench.tscn" id="3_4knqv"]
+
+[resource]
+script = ExtResource("1_qrkuf")
+item_types = 32
+name = "Workbench"
+icon = ExtResource("1_4knqv")
+scene = ExtResource("3_4knqv")
+mesh = ExtResource("1_ocakv")
+metadata/_custom_type_script = "uid://dw3rdx48mpbee"

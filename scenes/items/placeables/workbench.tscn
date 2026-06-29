@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://dbt1svk24ikvj"]
+
+[ext_resource type="ArrayMesh" uid="uid://21aq3ucaovpi" path="res://assets/models/items/mesh_workbench.tres" id="1_2h7pb"]
+[ext_resource type="Script" uid="uid://bt7lw468ebl5w" path="res://scripts/placeable.gd" id="1_7un50"]
+[ext_resource type="PackedScene" uid="uid://0ywjdrexe3r4" path="res://scenes/world_objects/placeable.tscn" id="2_h3x43"]
+
+[node name="WorkBench" type="Node3D" unique_id=1008058777]
+script = ExtResource("1_7un50")
+placeable_scene = ExtResource("2_h3x43")
+
+[node name="Visuals" type="Node3D" parent="." unique_id=1756509719]
+
+[node name="sword" type="MeshInstance3D" parent="Visuals" unique_id=1869942500]
+mesh = ExtResource("1_2h7pb")

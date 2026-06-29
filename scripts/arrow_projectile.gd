@@ -71,6 +71,8 @@ func _physics_process(delta: float) -> void:
 func _is_valid_hit(collider: Node) -> bool:
 	if not collider:
 		return false
+	if DamageResolver.is_target_owned_by(collider, shooter):
+		return false
 	
 	if not collider is Area3D:
 		# Physics bodies (e.g. solid walls, floors) are always valid hits.

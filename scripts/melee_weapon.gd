@@ -71,7 +71,7 @@ func _damage_overlapping_targets() -> void:
 	targets.append_array(hurtbox.get_overlapping_areas())
 
 	for target in targets:
-		if target == owner_character:
+		if DamageResolver.is_target_owned_by(target, owner_character):
 			continue
 
 		var target_node := DamageResolver.resolve_hittable(target)

@@ -45,3 +45,10 @@ shadow_enabled = true
 
 [node name="ItemPickup" parent="." unique_id=287374272 instance=ExtResource("4_x4b8f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7042727, -0.3844529, 3.7231102)
+
+[node name="Placeables" type="Node3D" parent="." unique_id=1348608107]
+unique_name_in_owner = true
+
+[node name="MultiplayerSpawner2" type="MultiplayerSpawner" parent="." unique_id=374647190]
+_spawnable_scenes = PackedStringArray("uid://0ywjdrexe3r4")
+spawn_path = NodePath("../Placeables")

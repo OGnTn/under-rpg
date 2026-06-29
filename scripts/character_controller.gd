@@ -150,6 +150,7 @@ func _apply_perspective() -> void:
 	spring_arm.position = eye_position + shoulder_offset if is_third_person else eye_position
 	camera.position = Vector3.ZERO
 	camera.rotation = Vector3.ZERO
+	spring_arm.rotation.x = -0.6
 
 	if character_model:
 		character_model.visible = is_third_person
