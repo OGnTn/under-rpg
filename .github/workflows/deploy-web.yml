@@ -19,7 +19,10 @@ jobs:
   export:
     name: Export Godot Web Build
     runs-on: ubuntu-latest
-    # REMOVED: job-level env block accessing `secrets`
+    # Map the secret to a job-level environment variable. 
+    # This safely outputs the string 'true' or 'false'.
+    env:
+      HAS_PAGES_TOKEN: ${{ secrets.PAGES_TOKEN != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,7 +43,7 @@ jobs:
           EOF
 
       - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v4 # BUMPED: v4 is recommended for newer Godot builds
+        uses: chickensoft-games/setup-godot@v4
         with:
           version: ${{ env.GODOT_VERSION }}
           include-templates: true
@@ -55,15 +58,16 @@ jobs:
           godot --headless --path . --export-release "${EXPORT_NAME}" "${EXPORT_PATH}"
           
       - name: Configure Pages (No Token)
-        if: secrets.PAGES_TOKEN == '' # MOVED: Evaluated at the step level
+        # We now check the safe `env` context instead of `secrets`
+        if: env.HAS_PAGES_TOKEN != 'true'
         uses: actions/configure-pages@v5
         
       - name: Configure Pages (With Token)
-        if: secrets.PAGES_TOKEN != '' # MOVED: Evaluated at the step level
+        if: env.HAS_PAGES_TOKEN == 'true'
         uses: actions/configure-pages@v5
         with:
           enablement: true
-          token: ${{ secrets.PAGES_TOKEN }}
+          token: ${{ secrets.PAGES_TOKEN }} # Allowed in `with`, but not in `if`
           
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
