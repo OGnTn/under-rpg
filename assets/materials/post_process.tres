@@ -32,7 +32,7 @@ render_mode unshaded, blend_mix, depth_draw_never, depth_test_disabled;
 		method for better performance, please uncomment the NAIVE_NORMAL_RECONSTRUCTION
 		line below.
 */
-//#define SUPPORT_MOBILE
+#define SUPPORT_MOBILE
 //#define NAIVE_NORMAL_RECONSTRUCTION
 
 group_uniforms outline;

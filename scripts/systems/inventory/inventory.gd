@@ -7,6 +7,7 @@ class_name Inventory extends Node
 
 @export_group("Testing")
 @export var testing_fill_inventory_on_start := false
+@export var testing_item_registry: Registry = preload("res://resources/registries/items.tres")
 @export_dir var testing_item_scan_dir := "res://resources/items"
 
 # NEW: The allowed item types for the hotbar are now a single export variable.
@@ -41,14 +42,42 @@ func _ready() -> void:
 		_fill_inventory_for_testing()
 
 func _fill_inventory_for_testing() -> void:
+	var items := _load_testing_items_from_registry()
+	if items.is_empty():
+		items = _load_testing_items_from_scan_dir()
+
+	var items_to_add = min(inventory_size, items.size())
+	for i in range(items_to_add):
+		obtain_item(ItemStack.new(items[i], 1))
+
+
+func _load_testing_items_from_registry() -> Array[InventoryItem]:
+	var items: Array[InventoryItem] = []
+	if testing_item_registry == null:
+		return items
+
+	var string_ids := testing_item_registry.get_all_string_ids()
+	string_ids.sort()
+
+	for string_id in string_ids:
+		var item := testing_item_registry.load_entry(string_id) as InventoryItem
+		if item != null:
+			items.append(item)
+
+	return items
+
+
+func _load_testing_items_from_scan_dir() -> Array[InventoryItem]:
+	var items: Array[InventoryItem] = []
 	var item_paths := _find_inventory_item_paths(testing_item_scan_dir)
 	item_paths.sort()
 
-	var items_to_add = min(inventory_size, item_paths.size())
-	for i in range(items_to_add):
-		var item := load(item_paths[i]) as InventoryItem
+	for item_path in item_paths:
+		var item := load(item_path) as InventoryItem
 		if item != null:
-			obtain_item(ItemStack.new(item, 1))
+			items.append(item)
+
+	return items
 
 func _find_inventory_item_paths(scan_dir: String) -> PackedStringArray:
 	var item_paths := PackedStringArray()

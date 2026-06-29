@@ -6,6 +6,8 @@
 
 [resource]
 script = ExtResource("1_yg7oi")
+name = "Oak Planks"
+description = "Processed oak planks"
 icon = ExtResource("1_7v1tv")
 mesh = ExtResource("2_kn2ck")
 max_stack = 64

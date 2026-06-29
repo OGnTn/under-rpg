@@ -19,11 +19,6 @@ config/icon="res://icon.svg"
 
 CraftingManager="*uid://ckhgiisbvhsg"
 NetworkManager="*res://scripts/systems/networking/network_manager.gd"
-NetworkTime="*uid://cnqdxyjptkfvp"
-NetworkTimeSynchronizer="*uid://5rmn2ik3kjo8"
-NetworkRollback="*uid://gas743comroj"
-NetworkEvents="*uid://bdmobxxptryj0"
-NetworkPerformance="*uid://cqgf7aqmjfoa3"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]
@@ -35,7 +30,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg", "res://addons/item_icon_generator/plugin.cfg", "res://addons/yard/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg", "res://addons/godot_state_charts/plugin.cfg", "res://addons/item_icon_generator/plugin.cfg", "res://addons/tube/plugin.cfg", "res://addons/yard/plugin.cfg")
 
 [input]
 

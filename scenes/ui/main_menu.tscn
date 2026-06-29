@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b7fxs8ufa51ew"]
 
-[ext_resource type="Script" path="res://scripts/systems/networking/main_menu.gd" id="1_menu"]
+[ext_resource type="Script" uid="uid://dxt4thrx308rh" path="res://scripts/systems/networking/main_menu.gd" id="1_menu"]
 [ext_resource type="Theme" uid="uid://d2shdmbqhd2m6" path="res://resources/themes/base_theme.tres" id="2_theme"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=1024381596]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,7 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_menu")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=1537926399]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,7 +22,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.06, 0.06, 0.1, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="IPContainer" type="CenterContainer" parent="." unique_id=829777528]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,73 +30,143 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="IPContainer" unique_id=7806161]
 custom_minimum_size = Vector2(420, 0)
 layout_mode = 2
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="IPContainer/PanelContainer" unique_id=863659399]
 layout_mode = 2
 theme_override_constants/margin_left = 32
 theme_override_constants/margin_top = 32
 theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 32
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="IPContainer/PanelContainer/MarginContainer" unique_id=598800438]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Title" type="Label" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=606416592]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "The Underlands"
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Subtitle" type="Label" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=244433869]
+modulate = Color(0.7, 0.7, 0.7, 0.8)
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Multiplayer"
 horizontal_alignment = 1
-modulate = Color(0.7, 0.7, 0.7, 0.8)
 
-[node name="HSeparator" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=78047063]
 layout_mode = 2
 
-[node name="HostButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HostButton" type="Button" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=514122675]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Host Game"
 
-[node name="HSeparator2" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=933907706]
 layout_mode = 2
 
-[node name="JoinLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="JoinLabel" type="Label" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1325853548]
 layout_mode = 2
 text = "— Join Game —"
 horizontal_alignment = 1
 
-[node name="AddressInput" type="LineEdit" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="AddressInput" type="LineEdit" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=391867921]
 unique_name_in_owner = true
 layout_mode = 2
-placeholder_text = "IP Address"
 text = "localhost"
+placeholder_text = "IP Address"
 
-[node name="PortInput" type="LineEdit" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="PortInput" type="LineEdit" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1315053391]
 unique_name_in_owner = true
 layout_mode = 2
-placeholder_text = "Port"
 text = "9999"
+placeholder_text = "Port"
 
-[node name="JoinButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="JoinButton" type="Button" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1643693199]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Join Game"
 
-[node name="HSeparator3" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator3" type="HSeparator" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1235713714]
 layout_mode = 2
 
-[node name="StatusLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="StatusLabel" type="Label" parent="IPContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=736031432]
 unique_name_in_owner = true
 layout_mode = 2
-text = ""
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="WebRTCContainer" type="CenterContainer" parent="." unique_id=315564515]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="WebRTCContainer" unique_id=1226210261]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="WebRTCContainer/PanelContainer" unique_id=1984765150]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="WebRTCContainer/PanelContainer/MarginContainer" unique_id=809677158]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=864078202]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "The Underlands"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=646198458]
+modulate = Color(0.7, 0.7, 0.7, 0.8)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Multiplayer session"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1212932300]
+layout_mode = 2
+
+[node name="WebRTCHostButton" type="Button" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=2081703051]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Host Game"
+
+[node name="HSeparator2" type="HSeparator" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1765742621]
+layout_mode = 2
+
+[node name="JoinLabel" type="Label" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1978632773]
+layout_mode = 2
+text = "— Join Game —"
+horizontal_alignment = 1
+
+[node name="SessionCodeInput" type="LineEdit" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=418948893]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Session code..."
+
+[node name="WebRTCJoinButton" type="Button" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1557568346]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Join Game"
+
+[node name="HSeparator3" type="HSeparator" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1739062126]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="WebRTCContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=629342]
+layout_mode = 2
 horizontal_alignment = 1
 autowrap_mode = 2
