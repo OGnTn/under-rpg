@@ -19,8 +19,7 @@ jobs:
   export:
     name: Export Godot Web Build
     runs-on: ubuntu-latest
-    env:
-      PAGES_TOKEN_AVAILABLE: ${{ secrets.PAGES_TOKEN != '' }}
+    # REMOVED: job-level env block accessing `secrets`
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,7 +40,7 @@ jobs:
           EOF
 
       - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v2
+        uses: chickensoft-games/setup-godot@v4 # BUMPED: v4 is recommended for newer Godot builds
         with:
           version: ${{ env.GODOT_VERSION }}
           include-templates: true
@@ -55,12 +54,12 @@ jobs:
           mkdir -p build/web
           godot --headless --path . --export-release "${EXPORT_NAME}" "${EXPORT_PATH}"
           
-      - name: Configure Pages
-        if: env.PAGES_TOKEN_AVAILABLE != 'true'
+      - name: Configure Pages (No Token)
+        if: secrets.PAGES_TOKEN == '' # MOVED: Evaluated at the step level
         uses: actions/configure-pages@v5
         
-      - name: Configure Pages with enablement
-        if: env.PAGES_TOKEN_AVAILABLE == 'true'
+      - name: Configure Pages (With Token)
+        if: secrets.PAGES_TOKEN != '' # MOVED: Evaluated at the step level
         uses: actions/configure-pages@v5
         with:
           enablement: true
