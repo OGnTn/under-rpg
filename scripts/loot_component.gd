@@ -58,4 +58,7 @@ func spawn_drops() -> void:
 			
 		spawn_parent.add_child(drop)
 		drop.global_position = spawn_pos
-		drop.setup(stack, initial_velocity)
+		
+		var drop_component = drop.get_node_or_null("WorldItemComponent")
+		if drop_component:
+			drop_component.setup(stack, initial_velocity)

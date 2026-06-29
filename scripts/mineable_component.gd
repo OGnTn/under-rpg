@@ -7,7 +7,7 @@ signal health_depleted()
 @export var max_hits: int = 5
 @export var destroy_parent_on_depletion: bool = true
 
-@onready var current_hits: int = max_hits:
+@export var current_hits: int = max_hits:
 	set(value):
 		var old_value = current_hits
 		current_hits = clampi(value, 0, max_hits)
@@ -32,8 +32,9 @@ func _on_hittable_hit(damage: int, damage_source: Node3D, _pos: Vector3, _normal
 	if tool_compat and not tool_compat.is_compatible(damage_source):
 		return
 
-	take_hit()
+	take_hit.rpc()
 
+@rpc("any_peer", "call_local", "reliable")
 func take_hit() -> void:
 	if not _can_mutate():
 		return
@@ -43,7 +44,14 @@ func take_hit() -> void:
 	
 	if current_hits <= 0:
 		if destroy_parent_on_depletion:
-			get_parent().queue_free()
+			if multiplayer.has_multiplayer_peer():
+				destroy_object.rpc()
+			else:
+				destroy_object()
+
+@rpc("authority", "call_local", "reliable")
+func destroy_object() -> void:
+	get_parent().queue_free()
 
 func _can_mutate() -> bool:
 	return not multiplayer.has_multiplayer_peer() or multiplayer.is_server()

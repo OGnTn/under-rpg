@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://cebjebvlk7wqh" path="res://assets/textures/items/icons/icon_flint_sword.tres" id="1_d1yjx"]
 [ext_resource type="ArrayMesh" uid="uid://cmfavd450idc4" path="res://assets/models/items/mesh_flint_sword.tres" id="2_64lno"]
-[ext_resource type="PackedScene" uid="uid://dbt1svk24ikvj" path="res://scenes/items/placeables/workbench.tscn" id="3_srqws"]
+[ext_resource type="PackedScene" uid="uid://b5do6vs2imlat" path="res://scenes/items/weapons/flint_sword.tscn" id="3_d1yjx"]
 [ext_resource type="Script" uid="uid://dw3rdx48mpbee" path="res://scripts/systems/inventory/inventory_item.gd" id="4_65pj4"]
 
 [resource]
@@ -11,6 +11,6 @@ item_types = 1
 name = "Flint Sword"
 description = "Simple sword made from flint"
 icon = ExtResource("1_d1yjx")
-scene = ExtResource("3_srqws")
+scene = ExtResource("3_d1yjx")
 mesh = ExtResource("2_64lno")
 metadata/_custom_type_script = "uid://dw3rdx48mpbee"

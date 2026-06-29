@@ -7,12 +7,10 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_0w8wl"]
 size = Vector3(0.5, 0.5, 0.5)
 
-[node name="WorldItem" type="Node3D" unique_id=1985230536]
-script = ExtResource("1_0w8wl")
+[node name="WorldItem" type="Node3D" unique_id=2138454859]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=770874169]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11602402, 0)
-mesh = ExtResource("1_g60ei")
+[node name="WorldItemComponent" type="Node" parent="." unique_id=2138454860]
+script = ExtResource("1_0w8wl")
 
 [node name="RayCast3D" type="RayCast3D" parent="." unique_id=888366441]
 target_position = Vector3(0, -0.5, 0)
@@ -22,9 +20,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.30451074, 0)
 monitoring = false
 script = ExtResource("3_wsb03")
 prompt_message = "Pick up"
+metadata/_custom_type_script = "uid://ywekou81er6x"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactable" unique_id=1379155852]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.023345947, -0.09181237, -0.0074157715)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.17385775, 0)
 shape = SubResource("BoxShape3D_0w8wl")
 
-[connection signal="interacted" from="Interactable" to="." method="pick_up"]
+[node name="Visuals" type="Node3D" parent="." unique_id=1406538429]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Visuals" unique_id=770874169]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.12574783, 0)
+mesh = ExtResource("1_g60ei")

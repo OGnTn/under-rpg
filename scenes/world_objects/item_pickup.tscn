@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://pvqynp38h74w"]
+[gd_scene format=3 uid="uid://b5rwa3d4nrfo2"]
 
 [ext_resource type="ArrayMesh" uid="uid://d2e8id22j21aq" path="res://assets/models/items/mesh_stick.tres" id="1_3spjx"]
 [ext_resource type="Shader" uid="uid://c6isk0y4wr1ly" path="res://assets/shaders/shader_blinking_aura.tres" id="2_0s11d"]

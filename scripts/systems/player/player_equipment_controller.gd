@@ -189,6 +189,8 @@ func _refresh_active_weapon() -> void:
 				break
 
 	if active_weapon:
+		if not active_weapon.item_resource and not equipped_item_path.is_empty():
+			active_weapon.item_resource = load(equipped_item_path)
 		active_weapon.setup(player, pose_blender)
 	elif pose_blender:
 		pose_blender.clear_animations()

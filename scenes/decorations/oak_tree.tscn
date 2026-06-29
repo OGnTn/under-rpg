@@ -11,6 +11,11 @@
 height = 3.2133179
 radius = 0.33007813
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_5hx13"]
+properties/0/path = NodePath("MineableComponent:current_hits")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
 [node name="OakTree" type="Node3D" unique_id=1190811662]
 
 [node name="Hittable" type="Area3D" parent="." unique_id=1957322308 node_paths=PackedStringArray("mesh_instance")]
@@ -45,3 +50,6 @@ min_tool_tier = 1
 script = ExtResource("5_loot")
 dropped_item = ExtResource("6_oak_logs")
 count = 3
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=689162173]
+replication_config = SubResource("SceneReplicationConfig_5hx13")

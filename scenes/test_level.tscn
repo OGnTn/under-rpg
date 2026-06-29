@@ -3,7 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://4o48k7mmq7v3" path="res://scenes/entities/chicken.tscn" id="1_paw1w"]
 [ext_resource type="Material" uid="uid://btlktlxgioejq" path="res://assets/materials/prototype_ground.tres" id="2_paw1w"]
 [ext_resource type="PackedScene" uid="uid://b8xcf14s154xk" path="res://scenes/decorations/oak_tree.tscn" id="4_tmr53"]
-[ext_resource type="PackedScene" uid="uid://pvqynp38h74w" path="res://scenes/world_objects/item_pickup.tscn" id="4_x4b8f"]
+[ext_resource type="PackedScene" uid="uid://cvsyjdn844b1w" path="res://scenes/world_objects/world_item.tscn" id="4_x4b8f"]
+[ext_resource type="Resource" uid="uid://bycs3wfxyt6gv" path="res://resources/items/res_stick.tres" id="5_stick"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_ke0wg"]
 vertices = PackedVector3Array(-24.5, 0, -24.5, -24.5, 0, 24.5, 24.5, 0, 24.5, 24.5, 0, -24.5)
@@ -46,6 +47,10 @@ shadow_enabled = true
 
 [node name="ItemPickup" parent="." unique_id=287374272 instance=ExtResource("4_x4b8f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7042727, -0.3844529, 3.7231102)
+
+[node name="WorldItemComponent" parent="ItemPickup" index="0"]
+item = ExtResource("5_stick")
+count = 1
 
 [node name="Placeables" type="Node3D" parent="." unique_id=1348608107]
 unique_name_in_owner = true
