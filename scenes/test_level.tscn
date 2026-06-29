@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://4o48k7mmq7v3" path="res://scenes/entities/chicken.tscn" id="1_paw1w"]
 [ext_resource type="Material" uid="uid://btlktlxgioejq" path="res://assets/materials/prototype_ground.tres" id="2_paw1w"]
 [ext_resource type="PackedScene" uid="uid://crb2uueb6mcpj" path="res://scenes/bush.tscn" id="3_j6w7d"]
+[ext_resource type="PackedScene" uid="uid://pvqynp38h74w" path="res://scenes/world_objects/item_pickup.tscn" id="4_x4b8f"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_ke0wg"]
 vertices = PackedVector3Array(-24.5, 0, -24.5, -24.5, 0, 24.5, 24.5, 0, 24.5, 24.5, 0, -24.5)
@@ -45,3 +46,6 @@ shadow_enabled = true
 
 [node name="bush" parent="." unique_id=1653162554 instance=ExtResource("3_j6w7d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0656967, -0.33617318, 6.0765295)
+
+[node name="ItemPickup" parent="." unique_id=287374272 instance=ExtResource("4_x4b8f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7042727, -0.3844529, 3.7231102)
