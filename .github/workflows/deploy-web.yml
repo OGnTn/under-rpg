@@ -1,25 +1,20 @@
 name: Deploy Web Export
-
 on:
   push:
     branches:
       - main
   workflow_dispatch:
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
   group: pages
   cancel-in-progress: false
-
 env:
   GODOT_VERSION: 4.7.0
   EXPORT_NAME: Web
   EXPORT_PATH: build/web/index.html
-
 jobs:
   export:
     name: Export Godot Web Build
@@ -30,6 +25,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender
+
+      - name: Configure Godot Editor Settings
+        run: |
+          mkdir -p ~/.config/godot
+          cat <<EOF > ~/.config/godot/editor_settings-4.tres
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          filesystem/import/blender/blender_path = "/usr/bin/blender"
+          filesystem/import/blender/blender3_path = "/usr/bin/blender"
+          EOF
+
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
         with:
@@ -37,22 +47,25 @@ jobs:
           include-templates: true
           use-dotnet: false
 
+      - name: Import Assets
+        run: godot --headless --verbose --editor --quit
+
       - name: Export Web preset
         run: |
           mkdir -p build/web
           godot --headless --path . --export-release "${EXPORT_NAME}" "${EXPORT_PATH}"
-
+          
       - name: Configure Pages
         if: env.PAGES_TOKEN_AVAILABLE != 'true'
         uses: actions/configure-pages@v5
-
+        
       - name: Configure Pages with enablement
         if: env.PAGES_TOKEN_AVAILABLE == 'true'
         uses: actions/configure-pages@v5
         with:
           enablement: true
           token: ${{ secrets.PAGES_TOKEN }}
-
+          
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
