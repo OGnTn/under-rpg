@@ -40,4 +40,22 @@ func spawn_drops() -> void:
 		
 		var spawn_pos = parent.global_position
 		
-		GameManager.spawn_world_item_synced.rpc(stack.item.resource_path, stack.count, spawn_pos, initial_velocity, drop_name)
+		var drop = world_item.instantiate()
+		drop.name = drop_name
+		
+		var spawn_parent = null
+		if parent.is_inside_tree():
+			var level = parent.get_tree().current_scene
+			if level:
+				spawn_parent = level.get_node_or_null("%WorldItems")
+				if not spawn_parent:
+					spawn_parent = level.find_child("WorldItems", true, false)
+				if not spawn_parent:
+					spawn_parent = level
+		
+		if not spawn_parent:
+			spawn_parent = parent.get_parent()
+			
+		spawn_parent.add_child(drop)
+		drop.global_position = spawn_pos
+		drop.setup(stack, initial_velocity)

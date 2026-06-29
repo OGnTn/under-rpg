@@ -27,4 +27,5 @@ script = ExtResource("2_xb7rh")
 name = "Flint Sword"
 ingredients = Array[ExtResource("1_bpgxg")]([SubResource("Resource_8o4av"), SubResource("Resource_vpsf5")])
 results = Array[ExtResource("1_bpgxg")]([SubResource("Resource_xi8ea")])
+station = "workbench"
 metadata/_custom_type_script = "uid://dv7ybhb7iob4v"

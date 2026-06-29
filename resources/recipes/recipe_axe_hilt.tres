@@ -26,4 +26,5 @@ script = ExtResource("2_4asqg")
 name = "Axe Hilt"
 ingredients = Array[ExtResource("1_ncsfw")]([SubResource("Resource_8o4av"), SubResource("Resource_vpsf5")])
 results = Array[ExtResource("1_ncsfw")]([SubResource("Resource_xi8ea")])
+station = "workbench"
 metadata/_custom_type_script = "uid://dv7ybhb7iob4v"

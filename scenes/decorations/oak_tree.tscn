@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://b8xcf14s154xk"]
+
+[ext_resource type="Script" uid="uid://m8kfp8taboxr" path="res://scripts/systems/entities/hittable.gd" id="1_slhjs"]
+[ext_resource type="ArrayMesh" uid="uid://da74l417xklnr" path="res://assets/models/objects/mesh_oak_tree.tres" id="2_mksjh"]
+[ext_resource type="Script" uid="uid://dqlplq7ywkr2e" path="res://scripts/mineable_component.gd" id="3_mineable"]
+[ext_resource type="Script" uid="uid://dnpjxiumah33q" path="res://scripts/tool_compatibility_component.gd" id="4_tool_compat"]
+[ext_resource type="Script" uid="uid://dh8w2d8smpbhh" path="res://scripts/loot_component.gd" id="5_loot"]
+[ext_resource type="Resource" uid="uid://bsmc3dxqx3ngq" path="res://resources/items/res_oak_logs.tres" id="6_oak_logs"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_mduoy"]
+height = 3.2133179
+radius = 0.33007813
+
+[node name="OakTree" type="Node3D" unique_id=1190811662]
+
+[node name="Hittable" type="Area3D" parent="." unique_id=1957322308 node_paths=PackedStringArray("mesh_instance")]
+script = ExtResource("1_slhjs")
+mesh_instance = NodePath("../Visuals/MeshInstance3D")
+metadata/_custom_type_script = "uid://m8kfp8taboxr"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hittable" unique_id=874667125]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4399719, 0)
+shape = SubResource("CylinderShape3D_mduoy")
+
+[node name="Visuals" type="Node3D" parent="." unique_id=2079683263]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Visuals" unique_id=1536755734]
+mesh = ExtResource("2_mksjh")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1822681621]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1269021656]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4399719, 0)
+shape = SubResource("CylinderShape3D_mduoy")
+
+[node name="MineableComponent" type="Node" parent="." unique_id=1025289328]
+script = ExtResource("3_mineable")
+
+[node name="ToolCompatibilityComponent" type="Node" parent="." unique_id=1025289329]
+script = ExtResource("4_tool_compat")
+requires_tool = true
+min_tool_tier = 1
+
+[node name="LootComponent" type="Node" parent="." unique_id=1025289330]
+script = ExtResource("5_loot")
+dropped_item = ExtResource("6_oak_logs")
+count = 3

@@ -1,8 +1,9 @@
 class_name WorldItem
-extends Area3D
+extends Node3D
 
 @onready var mesh_instance: MeshInstance3D = $MeshInstance3D
 @onready var ray_cast: RayCast3D = $RayCast3D
+var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 var item_stack: ItemStack
 var velocity: Vector3 = Vector3.ZERO
@@ -56,16 +57,25 @@ func _physics_process(delta: float):
 
 func _land():
 	is_falling = false
-	
+	var duration: float = global_position.distance_to(ray_cast.get_collision_point())
+	print(duration)
+	var tween: Tween = create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_CUBIC)
+	tween.tween_property(self, "global_position", ray_cast.get_collision_point(), duration)
+	tween.parallel().tween_property(mesh_instance, "rotation", Vector3.ZERO, duration)
+	tween.tween_callback(func():
+		set_physics_process(false)
+		)
 	# Snap exactly to the hit point so we don't float or clip
-	global_position = ray_cast.get_collision_point()
+	#global_position = ray_cast.get_collision_point()
 	
 	# Align to the floor normal (optional, makes it lie flat)
 	# look_at_from_position(global_position, global_position + Vector3.UP, ray_cast.get_collision_normal())
 	
 	# Reset rotation if you want it upright, or leave it tumbled
-	mesh_instance.rotation = Vector3.ZERO 
+	#mesh_instance.rotation = Vector3.ZERO 
 	
 	# PERFORMANCE OPTIMIZATION: 
 	# Stop this script from running _physics_process entirely
-	set_physics_process(false)
+	#set_physics_process(false)

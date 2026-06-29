@@ -213,6 +213,11 @@ func hide_inventory():
 		ui_hidden.emit()
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
+func open_station(station_name: String) -> void:
+	if crafting_ui and crafting_ui.has_method("set_station_filter"):
+		crafting_ui.set_station_filter(station_name)
+	show_inventory()
+
 func _input(event: InputEvent) -> void:
 	if (is_multiplayer_authority()):
 		if event.is_action_pressed("toggle_inventory"):
@@ -356,6 +361,8 @@ func _on_ui_hidden() -> void:
 	var character_preview = get_node_or_null("%CharacterPreview")
 	if character_preview:
 		character_preview.cleanup()
+	if crafting_ui and crafting_ui.has_method("set_station_filter"):
+		crafting_ui.set_station_filter("manual")
 
 # --- EQUIPMENT SLOTS SETUP & HANDLERS ---
 

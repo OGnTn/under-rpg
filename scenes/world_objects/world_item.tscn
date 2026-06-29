@@ -1,21 +1,18 @@
 [gd_scene format=3 uid="uid://cvsyjdn844b1w"]
 
-[ext_resource type="Script" uid="uid://b8lm6ykungkyu" path="res://entities/world_item/world_item.gd" id="1_0w8wl"]
-[ext_resource type="ArrayMesh" uid="uid://d0pfd57caenmb" path="res://entities/items/item_oak_logs/mesh_oak_logs.res" id="1_g60ei"]
-[ext_resource type="Script" uid="uid://m8tib6vypnmg" path="res://entities/interactable/interactable.gd" id="3_wsb03"]
+[ext_resource type="Script" uid="uid://b24olqulikpv2" path="res://scripts/systems/entities/world_item.gd" id="1_0w8wl"]
+[ext_resource type="ArrayMesh" uid="uid://bv3ihpe23fvww" path="res://assets/models/items/mesh_oak_logs.tres" id="1_g60ei"]
+[ext_resource type="Script" uid="uid://ywekou81er6x" path="res://scripts/systems/entities/interactable.gd" id="3_wsb03"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0w8wl"]
+size = Vector3(0.5, 0.5, 0.5)
 
-[node name="WorldItem" type="Area3D" unique_id=2138454859]
+[node name="WorldItem" type="Node3D" unique_id=1985230536]
 script = ExtResource("1_0w8wl")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=770874169]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.30451074, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11602402, 0)
 mesh = ExtResource("1_g60ei")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1597115762]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.30451074, 0)
-shape = SubResource("BoxShape3D_0w8wl")
 
 [node name="RayCast3D" type="RayCast3D" parent="." unique_id=888366441]
 target_position = Vector3(0, -0.5, 0)
@@ -25,9 +22,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.30451074, 0)
 monitoring = false
 script = ExtResource("3_wsb03")
 prompt_message = "Pick up"
-metadata/_custom_type_script = "uid://m8tib6vypnmg"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Interactable" unique_id=1379155852]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.023345947, -0.09181237, -0.0074157715)
 shape = SubResource("BoxShape3D_0w8wl")
 
 [connection signal="interacted" from="Interactable" to="." method="pick_up"]

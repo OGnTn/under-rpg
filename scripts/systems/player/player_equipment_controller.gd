@@ -140,29 +140,19 @@ func _on_weapon_path_changed() -> void:
 	_apply_weapon_path(equipped_item_path)
 
 func _apply_weapon_path(path: String) -> void:
-	print("APPLY WEAPON PATH: ", path)
 	_clear_equipped_weapon()
 	_hide_socket_weapons()
 
 	if path.is_empty() or not weapon_socket:
-		print("Path is empty or weapon socket is null")
 		_refresh_active_weapon()
 		return
 
 	var item := load(path) as InventoryItem
-	print("Loaded item: ", item)
-	if not item:
-		print("Failed to load item from path")
-		_refresh_active_weapon()
-		return
-	print("Item scene: ", item.scene)
-	if not item.scene:
-		print("Item has no scene configured")
+	if not item or not item.scene:
 		_refresh_active_weapon()
 		return
 
 	var instance := item.scene.instantiate() as Node3D
-	print("Instantiated weapon scene: ", instance)
 	if not instance:
 		_refresh_active_weapon()
 		return
@@ -174,7 +164,6 @@ func _apply_weapon_path(path: String) -> void:
 		instance.item_resource = item
 
 	weapon_socket.add_child(instance)
-	print("Successfully added weapon instance to socket")
 	equipped_item_node = instance
 	_refresh_active_weapon()
 
@@ -221,12 +210,6 @@ func _switch_hotbar_selection(direction: int) -> void:
 	inventory.handle_hotbar_select(new_selection)
 
 func _on_hotbar_selection_updated(item_stack: ItemStack) -> void:
-	print("HOTBAR SELECTION UPDATED: ", item_stack)
-	if item_stack:
-		print("  is_empty: ", item_stack.is_empty())
-		if not item_stack.is_empty() and item_stack.item:
-			print("  item name: ", item_stack.item.name)
-			print("  item scene: ", item_stack.item.scene)
 	if item_stack and not item_stack.is_empty() and item_stack.item.scene:
 		equip_item(item_stack.item.resource_path)
 	else:

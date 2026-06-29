@@ -39,6 +39,10 @@ func set_external_inventory(inv: Inventory):
 			
 	refresh_list()
 
+func set_station_filter(station: String) -> void:
+	current_station_filter = station
+	refresh_list()
+
 func _on_recipe_unlocked(_recipe):
 	refresh_list()
 
@@ -58,8 +62,8 @@ func refresh_list():
 	if external_inventory: inventory_list.append(external_inventory)
 	
 	for recipe in all_recipes:
-		# Filter by station
-		if recipe.station != current_station_filter:
+		# Filter by station: allow "manual" recipes and recipes matching current_station_filter
+		if recipe.station != "manual" and recipe.station != current_station_filter:
 			continue
 			
 		# Filter by unlock status

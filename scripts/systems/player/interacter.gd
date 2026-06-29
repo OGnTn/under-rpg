@@ -17,14 +17,14 @@ func _ready() -> void:
 	_update_prompt(null)
 
 func get_target() -> Interactable:
-	return target
+	return target if is_instance_valid(target) else null
 
 func clear_target() -> void:
 	target = null
 	_update_prompt(null)
 
 func interact() -> void:
-	if not target:
+	if not is_instance_valid(target):
 		return
 	target.interact.rpc(multiplayer.get_unique_id())
 
@@ -38,7 +38,7 @@ func _physics_process(_delta: float) -> void:
 
 	_update_distance()
 	var next_target := _get_hovered_interactable()
-	if target != next_target:
+	if not is_instance_valid(target) or target != next_target:
 		target = next_target
 		_update_prompt(target)
 
