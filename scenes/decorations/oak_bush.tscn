@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://c17o20p8rudmu"]
+
+[ext_resource type="Script" uid="uid://b24olqulikpv2" path="res://scripts/systems/entities/world_item.gd" id="1_fx882"]
+[ext_resource type="Resource" uid="uid://6vm7r131c8ad" path="res://resources/items/res_string.tres" id="2_6w657"]
+[ext_resource type="Script" uid="uid://ywekou81er6x" path="res://scripts/systems/entities/interactable.gd" id="3_3hrta"]
+[ext_resource type="ArrayMesh" uid="uid://2fhgry4k84x3" path="res://assets/models/objects/mesh_oak_bush.tres" id="4_od26x"]
+[ext_resource type="Material" uid="uid://bw0j4ttdap8df" path="res://assets/materials/m_sty_leaves.tres" id="5_ae2qd"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ke0wg"]
+radius = 0.6
+
+[node name="OakBush" type="Node3D" unique_id=1058547663]
+
+[node name="Interactable" type="Area3D" parent="." unique_id=1997232660]
+script = ExtResource("3_3hrta")
+metadata/_custom_type_script = "uid://ywekou81er6x"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Interactable" unique_id=993118493]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.37557715, 0)
+shape = SubResource("SphereShape3D_ke0wg")
+
+[node name="Visuals" type="Node3D" parent="." unique_id=1090939489]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Visuals" unique_id=303811108]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.21338558, 0, 0)
+mesh = ExtResource("4_od26x")
+surface_material_override/0 = ExtResource("5_ae2qd")
+
+[node name="WorldItem" type="Node" parent="." unique_id=1266130781]
+script = ExtResource("1_fx882")
+item = ExtResource("2_6w657")
+count = 3
+override_mesh = false
+metadata/_custom_type_script = "uid://b24olqulikpv2"

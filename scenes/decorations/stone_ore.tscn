@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://cqkg6vbughk00"]
+
+[ext_resource type="Script" uid="uid://m8kfp8taboxr" path="res://scripts/systems/entities/hittable.gd" id="1_u5y00"]
+[ext_resource type="ArrayMesh" uid="uid://dbwb3sssp0lw6" path="res://assets/models/objects/mesh_stone_ore.tres" id="2_vhs44"]
+[ext_resource type="Script" uid="uid://dqlplq7ywkr2e" path="res://scripts/mineable_component.gd" id="3_tfyfi"]
+[ext_resource type="Script" uid="uid://dnpjxiumah33q" path="res://scripts/tool_compatibility_component.gd" id="4_bqj5w"]
+[ext_resource type="Script" uid="uid://dh8w2d8smpbhh" path="res://scripts/loot_component.gd" id="5_t2qtv"]
+[ext_resource type="Resource" uid="uid://tygud6l55x0h" path="res://resources/items/res_flint.tres" id="6_udi1j"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mduoy"]
+size = Vector3(1.2368164, 0.8305664, 1)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_3vkio"]
+properties/0/path = NodePath("MineableComponent:current_hits")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+
+[node name="StoneOre" type="Node3D" unique_id=1080952047]
+
+[node name="Hittable" type="Area3D" parent="." unique_id=280377471]
+script = ExtResource("1_u5y00")
+metadata/_custom_type_script = "uid://m8kfp8taboxr"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hittable" unique_id=674410587]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.120415926, 0.2719956, 0)
+shape = SubResource("BoxShape3D_mduoy")
+
+[node name="Visuals" type="Node3D" parent="." unique_id=804786177]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Visuals" unique_id=1087492822]
+mesh = ExtResource("2_vhs44")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=347240232]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1070401010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1184082, 0.27484947, 0)
+shape = SubResource("BoxShape3D_mduoy")
+
+[node name="MineableComponent" type="Node" parent="." unique_id=1334084270]
+script = ExtResource("3_tfyfi")
+
+[node name="ToolCompatibilityComponent" type="Node" parent="." unique_id=355784029]
+script = ExtResource("4_bqj5w")
+requires_tool = true
+resource_type = 2
+min_tool_tier = 1
+
+[node name="LootComponent" type="Node" parent="." unique_id=326777190]
+script = ExtResource("5_t2qtv")
+dropped_item = ExtResource("6_udi1j")
+count = 3
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1165473057]
+replication_config = SubResource("SceneReplicationConfig_3vkio")

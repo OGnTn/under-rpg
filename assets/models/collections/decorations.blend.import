@@ -48,6 +48,15 @@ _subresources={
 }
 },
 "meshes": {
+"decorations_mesh_oak_bush": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/objects/mesh_oak_bush.tres",
+"save_to_file/path": "uid://7p8g17lveq0w"
+},
 "decorations_mesh_oak_tree": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
@@ -56,6 +65,15 @@ _subresources={
 "save_to_file/enabled": true,
 "save_to_file/fallback_path": "res://assets/models/objects/mesh_oak_tree.tres",
 "save_to_file/path": "uid://ony41dbtnum5"
+},
+"decorations_mesh_stone_ore": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://assets/models/objects/mesh_stone_ore.tres",
+"save_to_file/path": "uid://bux2b5iu6y0c3"
 }
 }
 }

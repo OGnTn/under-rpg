@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://gwasg2o1cwub" path="res://scripts/weapon_attack_definition.gd" id="2_oh8yx"]
 [ext_resource type="Script" uid="uid://cbxlbjronabvs" path="res://scripts/weapon_pose_key.gd" id="3_3peyp"]
 [ext_resource type="Script" uid="uid://bxsyumhpord72" path="res://scripts/weapon_definition.gd" id="4_78yr4"]
-[ext_resource type="ArrayMesh" uid="uid://l6b7s5x0sq4h" path="res://assets/models/items/mesh_flint_pickaxe.tres" id="5_pghuo"]
+[ext_resource type="ArrayMesh" uid="uid://c2m5xlc31j1hf" path="res://assets/models/items/mesh_flint_pickaxe.tres" id="5_pghuo"]
 
 [sub_resource type="Curve" id="Curve_pghuo"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.49881798, 0.14545459), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]

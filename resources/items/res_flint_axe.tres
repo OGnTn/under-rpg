@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ToolItem" format=3 uid="uid://d11pbg3o8mbbw"]
 
 [ext_resource type="Texture2D" uid="uid://cfn4xkt2xe8fm" path="res://assets/textures/items/icons/icon_flint_axe.tres" id="1_x7uad"]
-[ext_resource type="ArrayMesh" uid="uid://dlc6grn5u3fgn" path="res://assets/models/items/mesh_flint_axe.tres" id="2_vscu1"]
+[ext_resource type="ArrayMesh" uid="uid://bgrhgrtx5nswe" path="res://assets/models/items/mesh_flint_axe.tres" id="2_vscu1"]
 [ext_resource type="PackedScene" uid="uid://c5eaxeoc7i60y" path="res://scenes/items/tools/flint_axe.tscn" id="3_jgyf5"]
 [ext_resource type="Script" uid="uid://bponmf1xgqtrx" path="res://scripts/systems/inventory/item_tool.gd" id="4_6e6io"]
 

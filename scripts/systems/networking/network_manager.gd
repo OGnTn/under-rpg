@@ -221,7 +221,7 @@ func _load_game_scene() -> void:
 
 	var level = get_tree().current_scene
 	players_container = level.get_node("Players")
-	spawner = level.get_node("MultiplayerSpawner")
+	spawner = level.get_node("PlayerSpawner")
 	spawner.spawn_function = _spawn_player
 
 

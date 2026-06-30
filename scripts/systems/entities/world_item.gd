@@ -4,10 +4,11 @@ class_name WorldItem
 @export_group("Static Placement")
 @export var item: InventoryItem
 @export var count: int = 1
+@export var override_mesh: bool = true
 
 @onready var parent: Node3D = get_parent()
-@onready var mesh_instance: MeshInstance3D = parent.get_node("Visuals/MeshInstance3D")
-@onready var ray_cast: RayCast3D = parent.get_node("RayCast3D")
+@onready var mesh_instance: MeshInstance3D = parent.get_node_or_null("Visuals/MeshInstance3D")
+@onready var ray_cast: RayCast3D = parent.get_node_or_null("RayCast3D")
 
 var item_stack: ItemStack
 var velocity: Vector3 = Vector3.ZERO
@@ -29,7 +30,8 @@ func _ready() -> void:
 	var interactable = parent.find_child("Interactable", true, false)
 	if interactable:
 		interactable.interacted.connect(pick_up)
-
+	if !mesh_instance:
+		mesh_instance = %MeshInstance3D
 @rpc("any_peer", "reliable")
 func request_item_data() -> void:
 	var sender_id = multiplayer.get_remote_sender_id()
@@ -63,7 +65,7 @@ func setup(stack: ItemStack, start_velocity: Vector3):
 	item_stack = stack
 	velocity = start_velocity
 	
-	if item_stack and item_stack.item and item_stack.item.mesh:
+	if override_mesh and item_stack and item_stack.item and item_stack.item.mesh and mesh_instance:
 		mesh_instance.mesh = item_stack.item.mesh
 
 func _physics_process(delta: float):
