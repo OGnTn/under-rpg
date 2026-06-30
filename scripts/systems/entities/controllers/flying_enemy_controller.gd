@@ -2,6 +2,7 @@ class_name FlyingEnemyController extends CharacterBody3D
 
 @export var fly_speed: float = 6.0
 @export var turn_speed: float = 4.0
+@export var custom_up_vector: Vector3 = Vector3.UP
 
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 
@@ -44,7 +45,7 @@ func _physics_process(delta: float) -> void:
 		# Rotate to face movement
 		if velocity.length() > 0.1:
 			var look_target = global_position + velocity
-			var target_xform = global_transform.looking_at(look_target, Vector3.UP)
+			var target_xform = global_transform.looking_at(look_target, custom_up_vector)
 			global_transform.basis = global_transform.basis.slerp(target_xform.basis, turn_speed * delta)
 
 	move_and_slide()

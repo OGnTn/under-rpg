@@ -7,7 +7,7 @@ class_name FlyingEnemyBehavior extends Node
 
 @export var wander_radius: float = 15.0
 @export var wander_altitude_min: float = 6.0
-@export var wander_altitude_max: float = 12.0
+@export var wander_altitude_max: float = 8.0
 
 @export var circle_distance: float = 8.0
 @export var circle_speed: float = 1.0 # Radians per second? Or just movement modification
