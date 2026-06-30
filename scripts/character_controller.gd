@@ -34,6 +34,9 @@ var inventory: Inventory:
 	get:
 		return get_node_or_null("Inventory") as Inventory
 
+signal jump
+signal land
+
 func _enter_tree() -> void:
 	if name.is_valid_int():
 		set_multiplayer_authority(name.to_int(), true)
@@ -165,6 +168,7 @@ func _apply_gravity(delta: float) -> void:
 func _apply_jump() -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
+		jump.emit()
 
 func _apply_movement(delta: float) -> void:
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
