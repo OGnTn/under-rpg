@@ -1,0 +1,208 @@
+[gd_scene format=3 uid="uid://b8x4p62k77lm"]
+
+[ext_resource type="Script" uid="uid://btu5fjwsuet1m" path="res://scripts/systems/entities/controllers/flying_enemy_controller.gd" id="1_qhy2x"]
+[ext_resource type="Script" uid="uid://d0pdtmybpxsf3" path="res://scripts/entity_component.gd" id="2_tkcch"]
+[ext_resource type="Script" uid="uid://c3n6f4arw2idn" path="res://scripts/resource_component.gd" id="3_7w0sf"]
+[ext_resource type="Script" uid="uid://m8kfp8taboxr" path="res://scripts/systems/entities/hittable.gd" id="4_in4lg"]
+[ext_resource type="Script" uid="uid://couw105c3bde4" path="res://addons/godot_state_charts/state_chart.gd" id="5_l28cw"]
+[ext_resource type="Script" uid="uid://jk2jm1g6q853" path="res://addons/godot_state_charts/compound_state.gd" id="6_r8dy5"]
+[ext_resource type="Script" uid="uid://cytafq8i1y8qm" path="res://addons/godot_state_charts/atomic_state.gd" id="7_4w1uo"]
+[ext_resource type="Script" uid="uid://cf1nsco3w0mf6" path="res://addons/godot_state_charts/transition.gd" id="8_enok7"]
+[ext_resource type="Script" uid="uid://dwusvkwojcpqc" path="res://scripts/systems/entities/behaviors/flying_enemy_behavior.gd" id="9_y06pm"]
+[ext_resource type="PackedScene" uid="uid://djqhahufnggl1" path="res://assets/models/collections/wasp.blend" id="10_qftf5"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_m2juv"]
+radius = 0.3010498
+height = 0.6020996
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qhy2x"]
+size = Vector3(1, 1, 1.8359375)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_q7dib"]
+radius = 10.228388
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hlb8m"]
+animation = &"walk"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_4fpkd"]
+animation = &"fly"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hr7mb"]
+animation = &"attack"
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_u1xfg"]
+fadein_time = 0.3
+fadeout_time = 0.2
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_wqw0c"]
+sync = true
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_f6706"]
+graph_offset = Vector2(-740.40137, -88.900375)
+nodes/output/position = Vector2(460, 100)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_4fpkd")
+nodes/Animation/position = Vector2(-560, -40)
+"nodes/Animation 2/node" = SubResource("AnimationNodeAnimation_hlb8m")
+"nodes/Animation 2/position" = Vector2(-500, 160)
+nodes/fly_walk/node = SubResource("AnimationNodeBlend2_wqw0c")
+nodes/fly_walk/position = Vector2(-32, 16)
+nodes/OneShot/node = SubResource("AnimationNodeOneShot_u1xfg")
+nodes/OneShot/position = Vector2(260, 180)
+nodes/Attack/node = SubResource("AnimationNodeAnimation_hr7mb")
+nodes/Attack/position = Vector2(-100, 320)
+node_connections = [&"output", 0, &"OneShot", &"fly_walk", 0, &"Animation", &"fly_walk", 1, &"Animation 2", &"OneShot", 0, &"fly_walk", &"OneShot", 1, &"Attack"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_gdxo8"]
+
+[node name="Wasp" type="CharacterBody3D" unique_id=2040284121 node_paths=PackedStringArray("animation_tree")]
+collision_layer = 4
+collision_mask = 5
+script = ExtResource("1_qhy2x")
+animation_tree = NodePath("AnimationTree")
+
+[node name="EntityComponent" type="Node" parent="." unique_id=-1197731916]
+script = ExtResource("2_tkcch")
+display_name = "Flying Enemy"
+faction = "Enemy"
+
+[node name="ResourceComponent" type="Node" parent="." unique_id=-1197731915]
+script = ExtResource("3_7w0sf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1315987485]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.001121968, 0.31025392, -0.28960025)
+shape = SubResource("CapsuleShape3D_m2juv")
+
+[node name="Hitbox" type="Area3D" parent="." unique_id=673763250]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10541111, 0.22771913, -0.28960025)
+collision_layer = 4
+script = ExtResource("4_in4lg")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hitbox" unique_id=334023397]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.10653308, -0.30102557, 0.41796875)
+shape = SubResource("BoxShape3D_qhy2x")
+
+[node name="DetectionArea" type="Area3D" parent="." unique_id=262130305]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.35169938, 0)
+collision_layer = 0
+collision_mask = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DetectionArea" unique_id=985224204]
+shape = SubResource("SphereShape3D_q7dib")
+debug_color = Color(0.86150455, 0, 0.3650815, 0.41960785)
+
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=767448670]
+root_node = NodePath("../wasp2")
+tree_root = SubResource("AnimationNodeBlendTree_f6706")
+anim_player = NodePath("../wasp2/AnimationPlayer")
+parameters/fly_walk/blend_amount = 0.0
+parameters/OneShot/active = false
+parameters/OneShot/internal_active = false
+parameters/OneShot/request = 0
+
+[node name="StateChart" type="Node" parent="." unique_id=646281402]
+script = ExtResource("5_l28cw")
+
+[node name="CompoundState" type="Node" parent="StateChart" unique_id=1161785347]
+script = ExtResource("6_r8dy5")
+initial_state = NodePath("Wander")
+
+[node name="Wander" type="Node" parent="StateChart/CompoundState" unique_id=2055917233]
+script = ExtResource("7_4w1uo")
+
+[node name="ToCircle" type="Node" parent="StateChart/CompoundState/Wander" unique_id=154457596]
+script = ExtResource("8_enok7")
+to = NodePath("../../Circle")
+event = &"PlayerDetected"
+delay_in_seconds = "0.0"
+
+[node name="Circle" type="Node" parent="StateChart/CompoundState" unique_id=399590942]
+script = ExtResource("7_4w1uo")
+
+[node name="ToWander" type="Node" parent="StateChart/CompoundState/Circle" unique_id=1732873123]
+script = ExtResource("8_enok7")
+to = NodePath("../../Wander")
+event = &"PlayerLost"
+delay_in_seconds = "0.0"
+
+[node name="ToSwoop" type="Node" parent="StateChart/CompoundState/Circle" unique_id=596104013]
+script = ExtResource("8_enok7")
+to = NodePath("../../Swoop")
+event = &"SwoopStart"
+delay_in_seconds = "0.0"
+
+[node name="Swoop" type="Node" parent="StateChart/CompoundState" unique_id=1670428048]
+script = ExtResource("7_4w1uo")
+
+[node name="ToRecover" type="Node" parent="StateChart/CompoundState/Swoop" unique_id=726752286]
+script = ExtResource("8_enok7")
+to = NodePath("../../Recover")
+delay_in_seconds = "1.5"
+
+[node name="ToWander" type="Node" parent="StateChart/CompoundState/Swoop" unique_id=108376447]
+script = ExtResource("8_enok7")
+to = NodePath("../../Wander")
+event = &"PlayerLost"
+delay_in_seconds = "0.0"
+
+[node name="Recover" type="Node" parent="StateChart/CompoundState" unique_id=362393732]
+script = ExtResource("7_4w1uo")
+
+[node name="ToCircle" type="Node" parent="StateChart/CompoundState/Recover" unique_id=1967650298]
+script = ExtResource("8_enok7")
+to = NodePath("../../Circle")
+delay_in_seconds = "1.0"
+
+[node name="ToWander" type="Node" parent="StateChart/CompoundState/Recover" unique_id=637386186]
+script = ExtResource("8_enok7")
+to = NodePath("../../Wander")
+event = &"PlayerLost"
+delay_in_seconds = "0.0"
+
+[node name="FlyingEnemyBehavior" type="Node" parent="." unique_id=1335984190 node_paths=PackedStringArray("state_chart", "controller", "hittable", "detection_area")]
+script = ExtResource("9_y06pm")
+state_chart = NodePath("../StateChart")
+controller = NodePath("..")
+hittable = NodePath("../Hitbox")
+detection_area = NodePath("../DetectionArea")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1767053007]
+path_height_offset = 0.3
+simplify_path = true
+simplify_epsilon = 3.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1252699902]
+visible = false
+mesh = SubResource("CapsuleMesh_gdxo8")
+
+[node name="wasp2" parent="." unique_id=1395707437 instance=ExtResource("10_qftf5")]
+transform = Transform3D(-1.7484556e-08, 0, 0.4, 0, 0.4, 0, -0.4, 0, -1.7484556e-08, 0, 0, 0)
+
+[node name="Skeleton3D" parent="wasp2/wasp" parent_id_path=PackedInt32Array(1395707437, 1608747836) index="0" unique_id=2021221929]
+bones/0/position = Vector3(-1.7857918, -0.779317, 1.9713884e-08)
+bones/0/rotation = Quaternion(0.31090483, 0.63508934, -0.31090468, 0.635089)
+bones/1/rotation = Quaternion(0.9430395, -0.084731, 0.05086306, 0.3176639)
+bones/2/rotation = Quaternion(0.38964716, 1.0571111e-06, 6.379026e-07, 0.92096424)
+bones/3/rotation = Quaternion(0.18455285, -0.052085094, 0.03604349, 0.9807794)
+bones/4/position = Vector3(0.60845196, -1.0686971, -0.089669205)
+bones/4/rotation = Quaternion(-0.415423, 0.26535904, -0.75344574, 0.43511835)
+bones/5/position = Vector3(-0.61567515, -1.077206, -0.07032803)
+bones/5/rotation = Quaternion(-0.55186814, -0.17869376, 0.65584713, 0.4830888)
+bones/8/rotation = Quaternion(0.44328558, 0.45674565, -0.120066725, 0.7618828)
+bones/10/rotation = Quaternion(0.45367503, -0.48626578, 0.020855725, 0.7465183)
+
+[node name="AnimationPlayer" parent="wasp2" index="1" unique_id=1653806979]
+autoplay = &"fly"
+
+[connection signal="body_entered" from="DetectionArea" to="FlyingEnemyBehavior" method="_on_detection_area_body_entered2"]
+[connection signal="body_entered" from="DetectionArea" to="FlyingEnemyBehavior" method="_on_detection_area_body_entered"]
+[connection signal="body_exited" from="DetectionArea" to="FlyingEnemyBehavior" method="_on_detection_area_body_exited"]
+[connection signal="state_entered" from="StateChart/CompoundState/Wander" to="FlyingEnemyBehavior" method="_on_wander_state_entered"]
+[connection signal="state_processing" from="StateChart/CompoundState/Wander" to="FlyingEnemyBehavior" method="_on_wander_state_processing"]
+[connection signal="state_entered" from="StateChart/CompoundState/Circle" to="FlyingEnemyBehavior" method="_on_circle_state_entered"]
+[connection signal="state_physics_processing" from="StateChart/CompoundState/Circle" to="FlyingEnemyBehavior" method="_on_circle_state_physics_process"]
+[connection signal="state_entered" from="StateChart/CompoundState/Swoop" to="FlyingEnemyBehavior" method="_on_swoop_state_entered"]
+[connection signal="state_exited" from="StateChart/CompoundState/Swoop" to="FlyingEnemyBehavior" method="_on_swoop_state_exited"]
+[connection signal="state_physics_processing" from="StateChart/CompoundState/Swoop" to="FlyingEnemyBehavior" method="_on_swoop_state_physics_process"]
+[connection signal="state_entered" from="StateChart/CompoundState/Recover" to="FlyingEnemyBehavior" method="_on_recover_state_entered"]
+
+[editable path="wasp2"]

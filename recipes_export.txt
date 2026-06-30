@@ -1,0 +1,13 @@
+=== Crafting Recipes ===
+
+--- Manual Crafting (no station) ---
+
+Flint + Axe Hilt = Flint Axe
+2x Flint + Axe Hilt = Flint Pickaxe
+Oak Logs = 4x Oak Planks
+2x Flint + Stick = Sword Hilt
+
+--- Workbench ---
+
+Oak Planks + Stick = Axe Hilt
+Sword Hilt + 2x Flint = Flint Sword

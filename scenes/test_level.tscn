@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cqkg6vbughk00" path="res://scenes/decorations/stone_ore.tscn" id="5_qcd3b"]
 [ext_resource type="PackedScene" uid="uid://yxu5nmfc63ew" path="res://scenes/fx/post_process.tscn" id="6_88ety"]
 [ext_resource type="PackedScene" uid="uid://c17o20p8rudmu" path="res://scenes/decorations/oak_bush.tscn" id="7_88ety"]
+[ext_resource type="PackedScene" uid="uid://b8x4p62k77lm" path="res://scenes/entities/wasp.tscn" id="7_ahbqi"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_ke0wg"]
 vertices = PackedVector3Array(-24.5, 0, -24.5, -24.5, 0, 24.5, 24.5, 0, 24.5, 24.5, 0, -24.5)
@@ -88,3 +89,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.313126, -0.20062649, 1.764
 
 [node name="OakBush2" parent="world" unique_id=268387313 instance=ExtResource("7_88ety")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9809065, -0.20062649, -2.717982)
+
+[node name="Wasp" parent="." unique_id=2040284121 instance=ExtResource("7_ahbqi")]
+transform = Transform3D(-0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, -0.70710677, 16.320866, 0.50000024, 6.0386486)
+
+[node name="Wasp2" parent="." unique_id=1096453986 instance=ExtResource("7_ahbqi")]
+transform = Transform3D(-0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, -0.70710677, 12.064335, 0.50000024, 12.467442)
