@@ -118,7 +118,7 @@ func flash_effect() -> void:
 	# Kill previous tween if we get hit rapidly
 	if _tween: _tween.kill()
 	_tween = create_tween()
-
+	print("tweening flash")
 	# 1. Apply the overlay immediately
 	mesh_instance.material_overlay = flash_material
 

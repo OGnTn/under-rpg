@@ -198,7 +198,7 @@ func _trigger_attack() -> void:
 	# Deal damage to player if within range
 	if is_instance_valid(target_entity):
 		var distance = controller.global_position.distance_to(target_entity.global_position)
-		if distance <= attack_distance + 1.2:
+		if distance <= attack_distance:
 			var player_hittable = DamageResolver.resolve_hittable(target_entity)
 			if player_hittable:
 				var hit_dir = (target_entity.global_position - controller.global_position).normalized()
@@ -287,6 +287,3 @@ func _update_fly_walk_blend(delta: float) -> void:
 	var old_blend = _fly_walk_blend
 	_fly_walk_blend = lerpf(_fly_walk_blend, target_blend, delta * 5.0)
 	controller.animation_tree.set("parameters/fly_walk/blend_amount", _fly_walk_blend)
-	
-	if abs(old_blend - _fly_walk_blend) > 0.05:
-		print("WaspBehavior: Blend amount updated to: ", _fly_walk_blend, " (target: ", target_blend, ")")

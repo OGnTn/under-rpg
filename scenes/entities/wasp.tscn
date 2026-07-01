@@ -15,6 +15,9 @@
 radius = 0.3010498
 height = 0.6020996
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qhy2x"]
+shading_mode = 0
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_qhy2x"]
 size = Vector3(1, 1, 1.8359375)
 
@@ -53,6 +56,23 @@ node_connections = [&"output", 0, &"OneShot", &"fly_walk", 0, &"Animation", &"fl
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_gdxo8"]
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhy2x"]
+properties/0/path = NodePath(".:rotation")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:current_state")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath(".:next_position")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath(".:is_dead")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("ResourceComponent:current_health")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+
 [node name="Wasp" type="CharacterBody3D" unique_id=2040284121 node_paths=PackedStringArray("animation_tree")]
 collision_layer = 4
 collision_mask = 5
@@ -71,10 +91,12 @@ script = ExtResource("3_7w0sf")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.001121968, 0.31025392, -0.28960025)
 shape = SubResource("CapsuleShape3D_m2juv")
 
-[node name="Hitbox" type="Area3D" parent="." unique_id=673763250]
+[node name="Hitbox" type="Area3D" parent="." unique_id=673763250 node_paths=PackedStringArray("mesh_instance")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.10541111, 0.22771913, -0.28960025)
 collision_layer = 4
 script = ExtResource("4_in4lg")
+mesh_instance = NodePath("../wasp2/wasp/Skeleton3D/mesh_wasp")
+flash_material = SubResource("StandardMaterial3D_qhy2x")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Hitbox" unique_id=334023397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.10653308, -0.30102557, 0.41796875)
@@ -182,6 +204,9 @@ state_chart = NodePath("../StateChart")
 controller = NodePath("..")
 hittable = NodePath("../Hitbox")
 detection_area = NodePath("../DetectionArea")
+circle_distance = 5.0
+circle_speed = 0.3
+swoop_duration = 1.0
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1767053007]
 path_height_offset = 0.3
@@ -196,18 +221,22 @@ mesh = SubResource("CapsuleMesh_gdxo8")
 transform = Transform3D(-1.7484556e-08, 0, 0.4, 0, 0.4, 0, -0.4, 0, -1.7484556e-08, 0, 0, 0)
 
 [node name="Skeleton3D" parent="wasp2/wasp" parent_id_path=PackedInt32Array(1395707437, 1023113944) index="0" unique_id=1048447451]
-bones/0/position = Vector3(-2.0047755, 1.1328282, -0.6815539)
-bones/0/rotation = Quaternion(0.68963856, 0.3103563, -0.46099973, 0.46428123)
+bones/0/position = Vector3(-2.0047755, 1.1328279, -0.266076)
+bones/0/rotation = Quaternion(0.6301558, 0.36318308, -0.5394679, 0.42423597)
 bones/1/rotation = Quaternion(0.9970107, -0.0002895881, 0.00014089291, 0.077263445)
-bones/2/rotation = Quaternion(-0.09880097, -0.038214415, -0.13002884, 0.985835)
-bones/3/rotation = Quaternion(0.1454637, -0.025331974, -0.07337946, 0.9863134)
+bones/2/rotation = Quaternion(-0.09957913, -0.015032127, -0.051150993, 0.99360037)
+bones/3/rotation = Quaternion(0.14583658, -0.009914933, -0.02871826, 0.9888421)
 bones/4/position = Vector3(0.6084518, -1.068697, -0.08966922)
-bones/4/rotation = Quaternion(0.48852572, 0.22015284, -0.74850756, 0.39065558)
+bones/4/rotation = Quaternion(0.5066315, 0.14724874, -0.7916104, 0.30821306)
 bones/5/position = Vector3(-0.61567515, -1.0772058, -0.07032797)
-bones/5/rotation = Quaternion(0.4434474, 0.12844342, 0.8506137, 0.25162107)
+bones/5/rotation = Quaternion(0.42241335, 0.0455438, 0.8411338, 0.33464396)
 bones/7/rotation = Quaternion(-0.41077492, 0.8516144, -0.084564626, -0.3144293)
-bones/8/rotation = Quaternion(0.5140263, 0.17830761, -0.1355421, 0.82801676)
-bones/10/rotation = Quaternion(0.86015284, -0.21999027, 0.08257701, 0.45268366)
+bones/8/rotation = Quaternion(0.6377746, 0.1966263, -0.12289262, 0.7344925)
+bones/10/rotation = Quaternion(0.7767405, -0.21336277, 0.10162848, 0.5837999)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=920817185]
+unique_name_in_owner = true
+replication_config = SubResource("SceneReplicationConfig_qhy2x")
 
 [connection signal="body_entered" from="DetectionArea" to="FlyingEnemyBehavior" method="_on_detection_area_body_entered"]
 [connection signal="body_exited" from="DetectionArea" to="FlyingEnemyBehavior" method="_on_detection_area_body_exited"]
